@@ -1,14 +1,17 @@
+// Dependencies
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// Shared
 import 'package:storytap/shared/prompt.dart';
 
 // Launcher screen
 
 class Launcher extends StatelessWidget {
   final primaryThemeColor = Color(0xFF0C3241);
-
+  final secondaryThemeColor = Color(0xFF08212b);
+  
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
@@ -71,23 +74,31 @@ class Launcher extends StatelessWidget {
                         primaryBtnText: "Register",
                         primaryBtnRoute: "/register",
                         secondaryBtnText: "Skip",
-                        secondaryBtnRoute: "/home",
+                        secondaryBtnRoute: "/anonSignIn",
+                        pushNamed: true,
                       ),
                     );
                   },
                 ),
                 SizedBox(
-                  height: _height * 0.05,
+                  height: _height * 0.04,
                 ),
-                FlatButton(
+                RaisedButton(
+                  padding: const EdgeInsets.only(
+                      top: 10, bottom: 10, left: 30, right: 30),
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40)),
                   child: Text(
                     "Sign In",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: primaryThemeColor,
                       fontSize: 24,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/signIn');
+                  },
                 ),
               ],
             ),

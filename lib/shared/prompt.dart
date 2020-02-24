@@ -10,6 +10,7 @@ class Prompt extends StatelessWidget {
   final String primaryBtnRoute;
   final String secondaryBtnText;
   final String secondaryBtnRoute;
+  final bool pushNamed; // Determines what type of navigator to use
   final primaryThemeColor = Color(0xFF0C3241);
   final secondaryThemeColor = Color(0xFF707070);
 
@@ -18,6 +19,7 @@ class Prompt extends StatelessWidget {
     @required this.description,
     @required this.primaryBtnText,
     @required this.primaryBtnRoute,
+    this.pushNamed,
     this.secondaryBtnText,
     this.secondaryBtnRoute,
   });
@@ -81,7 +83,7 @@ class Prompt extends StatelessWidget {
                 RaisedButton(
                   color: primaryThemeColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(40.0),
                   ),
                   child: AutoSizeText(
                     primaryBtnText,
@@ -92,8 +94,15 @@ class Prompt extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushReplacementNamed(primaryBtnRoute);
+                    if (pushNamed == true) {
+                      // Pushes a new route without disposing original
+                      Navigator.of(context).pushNamed(primaryBtnRoute);
+                    } else {
+                      // Navigates and disposes original route path
+                      Navigator.of(context).pop();
+                      Navigator.of(context)
+                          .pushReplacementNamed(primaryBtnRoute);
+                    }
                   },
                 ),
                 SizedBox(height: 10.0),
@@ -109,22 +118,31 @@ class Prompt extends StatelessWidget {
   Widget buildSecondaryBtn(BuildContext context) {
     if (secondaryBtnRoute != null && secondaryBtnText != null) {
       return FlatButton(
+        color: primaryThemeColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40.0),
+        ),
         child: AutoSizeText(
           secondaryBtnText,
           maxLines: 1,
           style: TextStyle(
             fontSize: 24,
-            color: primaryThemeColor,
+            color: Colors.white,
           ),
         ),
         onPressed: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).pushReplacementNamed(secondaryBtnRoute);
+          if (pushNamed == true) {
+            Navigator.of(context).pushNamed(secondaryBtnRoute);
+          } else {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed(secondaryBtnRoute);
+          }
         },
       );
-    }
-    else {
-      return SizedBox(height: 10.0,);
+    } else {
+      return SizedBox(
+        height: 10.0,
+      );
     }
   }
 }
