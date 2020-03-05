@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+// Services
 import 'services/auth.dart';
+// Shared
 import 'shared/provider.dart';
-// Views
-import 'screens/launcher/welcome.dart';
+import 'package:storytap/shared/loading.dart';
+// Screens
+import 'screens/welcome/welcome.dart';
 import 'screens/home/home.dart';
 import 'screens/authenticate/authenticate.dart';
-import 'package:storytap/shared/loading.dart';
+import 'package:storytap/screens/navbar.dart';
+
+
 
 void main() => runApp(MyApp());
 
@@ -20,13 +25,18 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Launcher(),
+        home: NavigationBar(),
         routes: <String, WidgetBuilder>{
-          '/register': (BuildContext context) => Authenticate(authFormType: AuthFormType.register,),
-          '/signIn': (BuildContext context) => Authenticate(authFormType: AuthFormType.signIn,),
-          '/anonSignIn' : (BuildContext context) => Authenticate(authFormType: AuthFormType.anonymous,),
+          '/register': (BuildContext context) => Authenticate(
+                authFormType: AuthFormType.register,
+              ),
+          '/signIn': (BuildContext context) => Authenticate(
+                authFormType: AuthFormType.signIn,
+              ),
+          '/anonSignIn': (BuildContext context) => Authenticate(
+                authFormType: AuthFormType.anonymous,
+              ),
           '/home': (BuildContext context) => HomeController(),
-          
         },
       ),
     );
@@ -43,7 +53,7 @@ class HomeController extends StatelessWidget {
       builder: (context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final bool signedIn = snapshot.hasData;
-          return signedIn ? Home() : Launcher();
+          return signedIn ? Home() : Welcome();
         }
         return Loading();
       },
@@ -52,4 +62,3 @@ class HomeController extends StatelessWidget {
 }
 
 // Alerts all child widgets that auth state changes
-
