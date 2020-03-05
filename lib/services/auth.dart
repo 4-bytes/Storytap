@@ -9,6 +9,22 @@ class Auth {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 
+  // Get user ID
+  Future<String> getUID() async {
+    return (await _firebaseAuth.currentUser()).uid;
+  }
+
+  // Get current user
+  Future getUser() async {
+    return await _firebaseAuth.currentUser();
+  }
+
+  // Checks if user is anonymous
+  Future<bool> isAnon() async {
+    bool result = (await _firebaseAuth.currentUser()).isAnonymous;
+    return result;
+  }
+
   // Displays screen based on authState changes
   Stream<String> get onAuthStateChanged => _firebaseAuth.onAuthStateChanged.map( 
     (FirebaseUser user) => user?.uid
@@ -17,7 +33,6 @@ class Auth {
   // Register new user
   Future<String> createNewUser(String email, String password, String username) async {
     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-
     await updateUserInfo(username, authResult.user);
     return authResult.user.uid;
   }
