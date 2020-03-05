@@ -8,31 +8,12 @@ import 'package:storytap/shared/provider.dart';
 import 'package:storytap/screens/authenticate/authenticate.dart';
 
 class Home extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: primaryThemeColor,
-      appBar: AppBar(
-        backgroundColor: secondaryThemeColor,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed: () async {
-                try {
-                  Auth auth = Provider.of(context).auth;
-                  await auth.signOut();
-                  print("Signed out");
-                } catch (error) {
-                  print(error);
-                }
-              })
-        ],
-      ),
-      body: Container(
+    return Container(
         height: _height,
         width: _width,
         child: Padding(
@@ -44,8 +25,18 @@ class Home extends StatelessWidget {
                 fontSize: 24,
               )),
         ),
-      ),
-      drawer: Drawer(),
     );
   }
 }
+
+
+/** Sign out 
+ * onPressed: () async {
+                try {
+                  Auth auth = Provider.of(context).auth;
+                  await auth.signOut();
+                  print("Signed out");
+                } catch (error) {
+                  print(error);
+                }
+ */
