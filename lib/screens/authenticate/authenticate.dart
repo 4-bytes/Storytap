@@ -10,6 +10,7 @@ import 'package:storytap/shared/loading.dart';
 
 final primaryThemeColor = Color(0xFF0C3241);
 final secondaryThemeColor = Color(0xFF08212b);
+final tertiaryThemeColor = Colors.blueGrey;
 
 enum AuthFormType {
   signIn,
