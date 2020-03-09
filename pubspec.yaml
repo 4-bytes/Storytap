@@ -31,6 +31,9 @@ dependencies:
   google_fonts: ^0.3.9
   flutter_spinkit: ^4.1.2
   flutter_auth_buttons: ^0.6.0
+  intl: ^0.16.1
+  zefyr: ^0.10.0
+  quill_delta: ^1.0.1
   
 dev_dependencies:
   flutter_test:
