@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:storytap/screens/authenticate/authenticate.dart';
 
+import 'package:storytap/services/auth.dart';
 // Screens
 import 'package:storytap/screens/home/home.dart';
 import 'package:storytap/screens/browse/browse.dart';
 import 'package:storytap/screens/create/create.dart';
 import 'package:storytap/screens/profile/profile.dart';
 import 'package:storytap/screens/settings/settings.dart';
+import 'package:storytap/screens/create/create_book.dart';
+
+// Models
+import 'package:storytap/models/book.dart';
 
 class NavigationBar extends StatefulWidget {
   @override
@@ -28,6 +33,76 @@ class _NavigationBar extends State<NavigationBar> {
     Settings(),
   ];
 
+  List<Widget> appBarIcons(BuildContext context) {
+    final newBook = new Book(title: "", cover: "", creationDate: DateTime.now(), description: "", genre: "", isComplete: true, lastUpdated: DateTime.now());
+    // Return  appBar icons based on current tab
+    if (_currentIndex == 0) {
+      // Home
+      setState(() {
+        _appBarWidgets = <Widget>[];
+      });
+      return _appBarWidgets;
+    } else if (_currentIndex == 1) {
+      // Browse
+      setState(() {
+        _appBarWidgets = <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {},
+          )
+        ];
+      });
+      return _appBarWidgets;
+    } else if (_currentIndex == 2) {
+      // Create
+      setState(() {
+        _appBarWidgets = <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CreateBook(book: newBook)));
+            },
+          ),
+        ];
+      });
+      return _appBarWidgets;
+    } else if (_currentIndex == 3) {
+      // Profile
+      setState(() {
+        _appBarWidgets = <Widget>[
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {},
+          )
+        ];
+      });
+      return _appBarWidgets;
+    } else if (_currentIndex == 4) {
+      // Settings
+
+      setState(() {
+        _appBarWidgets = <Widget>[
+          IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed:
+                  () {}), /* async {
+            try {
+                  Auth auth = Provider.of(context).auth;
+                  await auth.signOut();
+                  print("Signed out");
+                } catch (error) {
+                  print(error);
+                }
+                
+          }), */
+        ];
+      });
+      return _appBarWidgets;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
@@ -42,57 +117,6 @@ class _NavigationBar extends State<NavigationBar> {
       });
     }
 
-    List<Widget> appBarIcons() {
-      // Return  appBar icons based on current tab
-      if (_currentIndex == 0) {
-        // Home
-        setState(() {
-          _appBarWidgets = <Widget>[];
-        });
-        return _appBarWidgets;
-      } else if (_currentIndex == 1) {
-        // Browse
-        setState(() {
-          _appBarWidgets = <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
-            )
-          ];
-        });
-        return _appBarWidgets;
-      } else if (_currentIndex == 2) {
-        // Create
-        setState(() {
-          _appBarWidgets = <Widget>[
-            IconButton(
-                icon: Icon(Icons.add),
-                onPressed: (){},
-            ),
-          ];
-        });
-        return _appBarWidgets;
-      } else if (_currentIndex == 3) {
-        // Profile
-        setState(() {
-          _appBarWidgets = <Widget>[
-            IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {},
-            )
-          ];
-        });
-        return _appBarWidgets;
-      } else if (_currentIndex == 4) {
-        // Settings
-        setState(() {
-          _appBarWidgets = <Widget>[];
-        });
-        return _appBarWidgets;
-      }
-      return null;
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -100,9 +124,9 @@ class _NavigationBar extends State<NavigationBar> {
         ),
         centerTitle: true,
         backgroundColor: secondaryThemeColor,
-        actions: appBarIcons(),
+        actions: appBarIcons(context),
       ),
-      backgroundColor: bgColor,
+      backgroundColor: Colors.white,
       body: _children[_currentIndex],
       floatingActionButtonLocation: FloatingActionButtonLocation
           .centerDocked, //specify the location of the FAB
@@ -113,7 +137,7 @@ class _NavigationBar extends State<NavigationBar> {
             if (_clickedCenterBtn == false) {
               _clickedCenterBtn = true;
               setState(() {
-                bgColor = Colors.blueGrey[300];
+                bgColor = primaryThemeColor; // Colors.blueGrey[300];
               });
             }
             updateTabSelection(2, "Create", "Create");
@@ -200,6 +224,7 @@ class _NavigationBar extends State<NavigationBar> {
                     }
                   });
                   updateTabSelection(3, "Profile", "Profile");
+                  Navigator.of(context).pushNamed('/convertAnon');
                 },
                 iconSize: 27.0,
                 icon: Icon(
