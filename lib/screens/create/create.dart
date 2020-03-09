@@ -21,7 +21,6 @@ class Create extends StatelessWidget {
           child: Text("Create",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey,
                 fontSize: 24,
               )),
         ),
