@@ -9,8 +9,8 @@ import 'package:storytap/shared/prompt.dart';
 // Welcome screen
 
 class Welcome extends StatelessWidget {
-  final primaryThemeColor = Color(0xFF0C3241);
-  final secondaryThemeColor = Color(0xFF08212b);
+  final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
+  final secondaryThemeColor = Color(0xFF08212b); // Color(0xFF08212b)
   
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class Welcome extends StatelessWidget {
                         primaryBtnText: "Register",
                         primaryBtnRoute: "/register",
                         secondaryBtnText: "Skip",
-                        secondaryBtnRoute: "/anonSignIn",
+                        secondaryBtnRoute: "/signInAnon",
                         pushNamed: true,
                       ),
                     );
