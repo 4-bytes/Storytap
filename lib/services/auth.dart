@@ -60,9 +60,35 @@ class Auth {
     return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
+  // Deletes user
+  Future deleteUser() async{
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    user.delete();
+  }
+
   // Anonymous user sign in
   Future signInAnon(){
     return _firebaseAuth.signInAnonymously();
+  }
+
+  // Converts anon user using email credentials
+  Future convertAnonWithEmail(String email, String password, String username) async {
+    final user = await _firebaseAuth.currentUser();
+
+    // Links anon user with email and password
+    final credentials = EmailAuthProvider.getCredential(email: email, password: password);
+    await user.linkWithCredential(credentials);
+    await updateUserInfo(username, user);
+  }
+
+  // Convert anon user with Google
+  Future convertAnonWithGoogle(String email, String password, String username) async {
+    final user = await _firebaseAuth.currentUser();
+    final GoogleSignInAccount userAccount = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication _googleAuth = await userAccount.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(idToken: _googleAuth.idToken, accessToken: _googleAuth.accessToken);
+    await user.linkWithCredential(credential);
+    await updateUserInfo(_googleSignIn.currentUser.displayName, user);
   }
 
   // Sign in with Google
