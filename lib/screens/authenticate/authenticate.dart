@@ -8,16 +8,17 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:storytap/shared/validator.dart';
 import 'package:storytap/shared/loading.dart';
 
-final primaryThemeColor = Color(0xFF0C3241);
-final secondaryThemeColor = Color(0xFF08212b);
+  final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
+final secondaryThemeColor = Color(0xFF08212b); // Color(0xFF08212b)
 final tertiaryThemeColor = Colors.blueGrey;
 
 enum AuthFormType {
   signIn,
   register,
   resetPassword,
-  anonymous
-} // Determines signed in or not
+  signInAnon,
+  convertAnon
+} // Determines signed in or not, changes the state of the forms
 
 class Authenticate extends StatefulWidget {
   final AuthFormType authFormType;
@@ -50,7 +51,10 @@ class _AuthenticateState extends State<Authenticate> {
       setState(() {
         authFormType = AuthFormType.register;
       });
-    } else {
+    } else if (state == "home"){
+      Navigator.of(context).pop();
+    }
+    else {
       setState(() {
         authFormType = AuthFormType.signIn;
       });
@@ -73,29 +77,49 @@ class _AuthenticateState extends State<Authenticate> {
     if (validateFields() == true) {
       try {
         final auth = Provider.of(context).auth;
+
+        switch (authFormType){
+          case AuthFormType.signIn:
+            setState(() {
+              _loadingScreen = true;
+            });
+            String uid = await auth.signInUser(_email, _password);
+            print("Signed in using $uid");
+            await Future.delayed(const Duration(milliseconds: 2000), () {
+              print("Waited 3 seconds");
+            });
+            if (uid == null) {
+              setState(() {
+                _loadingScreen = false;
+              });
+            }
+            Navigator.pushNamedAndRemoveUntil(context, "/home", (r) => false);
+            break;
+          case AuthFormType.register:
+            // TODO: Handle this case.
+            break;
+          case AuthFormType.resetPassword:
+          // Reset password form
+            await auth.sendResetPassword(_email);
+            _infoMessage = "A password reset link has been sent to $_email";
+            setState(() {
+              authFormType = AuthFormType.signIn;
+            });
+            break;
+          case AuthFormType.signInAnon:
+            // TODO: Handle this case.
+            break;
+          case AuthFormType.convertAnon:
+            await auth.convertAnonWithEmail(_email, _password, _username);
+            Navigator.of(context).pop();
+            break;
+        }
+
         if (authFormType == AuthFormType.signIn) {
           // Sign in form
-          setState(() {
-            _loadingScreen = true;
-          });
-          String uid = await auth.signInUser(_email, _password);
-          print("Signed in using $uid");
-          await Future.delayed(const Duration(milliseconds: 2000), () {
-            print("Waited 3 seconds");
-          });
-          if (uid == null) {
-            setState(() {
-              _loadingScreen = false;
-            });
-          }
-          Navigator.pushNamedAndRemoveUntil(context, "/home", (r) => false);
+
         } else if (authFormType == AuthFormType.resetPassword) {
-          // Reset password form
-          await auth.sendResetPassword(_email);
-          _infoMessage = "A password reset link has been sent to $_email";
-          setState(() {
-            authFormType = AuthFormType.signIn;
-          });
+
         } else {
           // Register form
           setState(() {
@@ -124,7 +148,7 @@ class _AuthenticateState extends State<Authenticate> {
     }
   }
 
-  Future submitAnon() async {
+  Future submitAnon() async { // Sign in user anonymously
     try {
       setState(() {
         _loadingScreen = true;
@@ -147,7 +171,7 @@ class _AuthenticateState extends State<Authenticate> {
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
-    if (authFormType == AuthFormType.anonymous) {
+    if (authFormType == AuthFormType.signInAnon) {
       submitAnon();
     }
     return _loadingScreen
@@ -233,14 +257,15 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  AutoSizeText buildHeaderText() {
+  AutoSizeText buildHeaderText() { // Header text is built based on form states
     String _headerText;
-    if (authFormType == AuthFormType.register) {
-      _headerText = "Register Account";
+    if (authFormType == AuthFormType.signIn) {
+      _headerText = "Welcome Back";
     } else if (authFormType == AuthFormType.resetPassword) {
       _headerText = "Reset Password";
     } else {
-      _headerText = "Welcome Back";
+      _headerText = "Register Account";
+
     }
     return AutoSizeText(
       _headerText,
@@ -253,14 +278,14 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  AutoSizeText buildSubHeaderText() {
+  AutoSizeText buildSubHeaderText() { // SubHeader text is built based on form states
     String _subHeaderText;
-    if (authFormType == AuthFormType.register) {
-      _subHeaderText = "Thank you for joining us!";
+    if (authFormType == AuthFormType.signIn) {
+      _subHeaderText = "We're happy to see you again!";
     } else if (authFormType == AuthFormType.resetPassword) {
       _subHeaderText = "Enter an email to request a password reset.";
     } else {
-      _subHeaderText = "We're happy to see you again!";
+      _subHeaderText = "Thank you for joining us!";
     }
     return AutoSizeText(
       _subHeaderText,
@@ -273,7 +298,7 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  List<Widget> buildFields() {
+  List<Widget> buildFields() { // Creates fields based on the form state that is active
     List<Widget> textFields = [];
 
     if (authFormType == AuthFormType.resetPassword) {
@@ -296,7 +321,7 @@ class _AuthenticateState extends State<Authenticate> {
     }
 
     // If in register state then add username, email and password fields
-    if (authFormType == AuthFormType.register) {
+    if ([AuthFormType.register, AuthFormType.convertAnon].contains(AuthFormType)) {
       textFields.add(
         TextFormField(
           style: TextStyle(
@@ -362,7 +387,7 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  List<Widget> buildBtns() {
+  List<Widget> buildBtns() { // Creates btns for based on form
     String _switchBtn;
     String _newFormState;
     String _submitBtn;
@@ -381,7 +406,13 @@ class _AuthenticateState extends State<Authenticate> {
       _newFormState = "signIn";
       _submitBtn = "Submit email";
       _showSocialBtns = false;
-    } else {
+    } else if (authFormType == AuthFormType.convertAnon){
+      _switchBtn = "Back to Home";
+      _newFormState = "home";
+      _submitBtn = "Register";
+    }
+
+    else {
       _switchBtn = "Already have an account? Sign In";
       _newFormState = "SignIn";
       _submitBtn = "Register";
@@ -452,15 +483,26 @@ class _AuthenticateState extends State<Authenticate> {
           GoogleSignInButton(
             onPressed: () async {
               try {
-                setState(() {
-                  _loadingScreen = true;
-                });
-                await _auth.signInWithGoogle();
-                await Future.delayed(const Duration(milliseconds: 2000), () {
-                  print("Waited 3 seconds");
-                });
-                Navigator.pushNamedAndRemoveUntil(
-                    context, "/home", (r) => false);
+
+                if(authFormType == AuthFormType.convertAnon){
+                  await _auth.convertAnonWithGoogle(_email, _password, _username);
+                  await Future.delayed(const Duration(milliseconds: 2000), () {
+                    print("Waited 3 seconds");
+                  });
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/home", (r) => false);
+                }
+                else {
+                  setState(() {
+                    _loadingScreen = true;
+                  });
+                  await _auth.signInWithGoogle();
+                  await Future.delayed(const Duration(milliseconds: 2000), () {
+                    print("Waited 3 seconds");
+                  });
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/home", (r) => false);
+                }
               } catch (error) {
                 setState(() {
                   _loadingScreen = false;
