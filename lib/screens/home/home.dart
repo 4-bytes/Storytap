@@ -13,6 +13,11 @@ class Home extends StatelessWidget {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
 
+
+    void sjds(){
+      final auth = Provider.of(context).auth;
+    }
+
     return Container(
         height: _height,
         width: _width,
@@ -30,13 +35,3 @@ class Home extends StatelessWidget {
 }
 
 
-/** Sign out 
- * onPressed: () async {
-                try {
-                  Auth auth = Provider.of(context).auth;
-                  await auth.signOut();
-                  print("Signed out");
-                } catch (error) {
-                  print(error);
-                }
- */

@@ -19,6 +19,26 @@ class Settings extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
+          child: FlatButton(
+            child: Text("Sign out of session"),
+            onPressed: () async {
+              try {
+                final auth = Provider.of(context).auth;
+                if (await auth.isAnon()){
+                  print ("This is anon");
+                  await auth.deleteUser();
+                  print("Deleted successfully.");
+                }
+                else {
+                  print ("Real user");
+                  await auth.signOut();
+                }
+                print("Signed Out!");
+              } catch (e) {
+                print (e);
+              }
+            },
+          ),
           ),
         ),
       );
