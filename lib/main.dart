@@ -26,18 +26,21 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: NavigationBar(),
+        home: Welcome(),
         routes: <String, WidgetBuilder>{
+          '/home': (BuildContext context) => HomeController(),
           '/register': (BuildContext context) => Authenticate(
                 authFormType: AuthFormType.register,
               ),
           '/signIn': (BuildContext context) => Authenticate(
                 authFormType: AuthFormType.signIn,
               ),
-          '/anonSignIn': (BuildContext context) => Authenticate(
-                authFormType: AuthFormType.anonymous,
+          '/signInAnon': (BuildContext context) => Authenticate(
+                authFormType: AuthFormType.signInAnon,
               ),
-          '/home': (BuildContext context) => HomeController(),
+          '/convertAnon': (BuildContext context) => Authenticate(
+            authFormType: AuthFormType.convertAnon,
+          ),
         },
       ),
     );
@@ -54,7 +57,7 @@ class HomeController extends StatelessWidget {
       builder: (context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final bool signedIn = snapshot.hasData;
-          return signedIn ? Home() : Welcome();
+          return signedIn ? NavigationBar() : Welcome();
         }
         return Loading();
       },
