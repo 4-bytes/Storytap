@@ -2,16 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 // Shared
 import 'package:storytap/shared/prompt.dart';
 
-// Welcome screen
+// Welcome screen that is displayed when the user is not signed in
 
 class Welcome extends StatelessWidget {
   final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
   final secondaryThemeColor = Color(0xFF08212b); // Color(0xFF08212b)
-  
+
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;

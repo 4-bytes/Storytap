@@ -7,7 +7,12 @@ import 'package:storytap/shared/provider.dart';
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 
+// *** 
+// Displays settings screen.
+
 class Settings extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;

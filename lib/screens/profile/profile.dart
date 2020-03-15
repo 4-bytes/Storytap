@@ -7,6 +7,9 @@ import 'package:storytap/shared/provider.dart';
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 
+// *** 
+// Profile page for registered users.
+
 class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
