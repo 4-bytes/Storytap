@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+// *** 
+// Displays loading screen animation using flutter_spinkit.
+
 class Loading extends StatelessWidget {
-  final primaryThemeColor = Color(0xFF0C3241);
+
+  const Loading();
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryThemeColor,
+      backgroundColor: Color(0xFF0C3241),
       body: Center(child: SpinKitFoldingCube(
         color: Colors.grey,
         size: 60,
