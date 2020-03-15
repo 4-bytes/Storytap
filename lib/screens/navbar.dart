@@ -1,40 +1,43 @@
+// Packages
 import 'package:flutter/material.dart';
-import 'package:storytap/screens/authenticate/authenticate.dart';
-
+// Services
 import 'package:storytap/services/auth.dart';
 // Screens
 import 'package:storytap/screens/home/home.dart';
 import 'package:storytap/screens/browse/browse.dart';
-import 'package:storytap/screens/create/create.dart';
+import 'package:storytap/screens/manage/manage.dart';
 import 'package:storytap/screens/profile/profile.dart';
 import 'package:storytap/screens/settings/settings.dart';
-import 'package:storytap/screens/create/create_book.dart';
-
+import 'package:storytap/screens/manage/create/create_new_book.dart';
+import 'package:storytap/screens/authenticate/authenticate.dart';
 // Models
 import 'package:storytap/models/book.dart';
+
+// *** 
+// A widget that manages navigation using bottom and top appbar icons.
 
 class NavigationBar extends StatefulWidget {
   @override
   _NavigationBar createState() => _NavigationBar();
 }
 
-class _NavigationBar extends State<NavigationBar> {
+class _NavigationBar extends State<NavigationBar> { // Manages state of different objects
   int _currentIndex = 0;
   bool _clickedCenterBtn = false;
   String _text = "Home";
   String _titleText = "Home";
   Color bgColor = primaryThemeColor;
   List<Widget> _appBarWidgets;
-  final List<Widget> _children = [
-    Home(),
-    Browse(),
-    Create(),
-    Profile(),
-    Settings(),
+  final List<Widget> _screens = [
+    Home(), // Home screen
+    Browse(), // Browse books
+    Manage(), // Manage user books (create, edit, delete)
+    Profile(), // User profile
+    Settings(), // Settings
   ];
 
   List<Widget> appBarIcons(BuildContext context) {
-    final newBook = new Book(title: "", cover: "", creationDate: DateTime.now(), description: "", genre: "", isComplete: true, lastUpdated: DateTime.now());
+    final newBook = new Book(title: "", cover: "", creationDate: DateTime.now(), description: "", genre: "", isComplete: false, lastUpdated: DateTime.now(), author: "");
     // Return  appBar icons based on current tab
     if (_currentIndex == 0) {
       // Home
@@ -61,7 +64,7 @@ class _NavigationBar extends State<NavigationBar> {
             icon: Icon(Icons.add),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => CreateBook(book: newBook)));
+                  MaterialPageRoute(builder: (context) => CreateNewBook(book: newBook)));
             },
           ),
         ];
@@ -108,7 +111,7 @@ class _NavigationBar extends State<NavigationBar> {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
 
-    //call this method on click of each bottom app bar item to update the screen
+    // Method is called on click of each bottom app bar item to update the screen
     void updateTabSelection(int index, String titleText, String btnText) {
       setState(() {
         _titleText = titleText;
@@ -127,7 +130,7 @@ class _NavigationBar extends State<NavigationBar> {
         actions: appBarIcons(context),
       ),
       backgroundColor: Colors.white,
-      body: _children[_currentIndex],
+      body: _screens[_currentIndex],
       floatingActionButtonLocation: FloatingActionButtonLocation
           .centerDocked, //specify the location of the FAB
       floatingActionButton: FloatingActionButton(
@@ -140,7 +143,7 @@ class _NavigationBar extends State<NavigationBar> {
                 bgColor = primaryThemeColor; // Colors.blueGrey[300];
               });
             }
-            updateTabSelection(2, "Create", "Create");
+            updateTabSelection(2, "My Created Books", "My Created Books");
             // _clickedCenterBtn = !_clickedCenterBtn; //to update the animated container
           });
         },
