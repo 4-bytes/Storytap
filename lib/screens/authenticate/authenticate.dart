@@ -1,4 +1,4 @@
-// Dependencies
+// Packages
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:storytap/shared/provider.dart';
@@ -8,7 +8,11 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:storytap/shared/validator.dart';
 import 'package:storytap/shared/loading.dart';
 
-  final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
+// *** 
+// Authenticate screen that consists of signIn, register, resetPassword forms, 
+// as well as allowing users to sign in anon and convert to registered users.
+
+final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
 final secondaryThemeColor = Color(0xFF08212b); // Color(0xFF08212b)
 final tertiaryThemeColor = Colors.blueGrey;
 
@@ -51,10 +55,9 @@ class _AuthenticateState extends State<Authenticate> {
       setState(() {
         authFormType = AuthFormType.register;
       });
-    } else if (state == "home"){
+    } else if (state == "home") {
       Navigator.of(context).pop();
-    }
-    else {
+    } else {
       setState(() {
         authFormType = AuthFormType.signIn;
       });
@@ -78,7 +81,7 @@ class _AuthenticateState extends State<Authenticate> {
       try {
         final auth = Provider.of(context).auth;
 
-        switch (authFormType){
+        switch (authFormType) {
           case AuthFormType.signIn:
             setState(() {
               _loadingScreen = true;
@@ -99,7 +102,7 @@ class _AuthenticateState extends State<Authenticate> {
             // TODO: Handle this case.
             break;
           case AuthFormType.resetPassword:
-          // Reset password form
+            // Reset password form
             await auth.sendResetPassword(_email);
             _infoMessage = "A password reset link has been sent to $_email";
             setState(() {
@@ -119,7 +122,6 @@ class _AuthenticateState extends State<Authenticate> {
           // Sign in form
 
         } else if (authFormType == AuthFormType.resetPassword) {
-
         } else {
           // Register form
           setState(() {
@@ -148,7 +150,8 @@ class _AuthenticateState extends State<Authenticate> {
     }
   }
 
-  Future submitAnon() async { // Sign in user anonymously
+  Future submitAnon() async {
+    // Sign in user anonymously
     try {
       setState(() {
         _loadingScreen = true;
@@ -257,7 +260,8 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  AutoSizeText buildHeaderText() { // Header text is built based on form states
+  AutoSizeText buildHeaderText() {
+    // Header text is built based on form states
     String _headerText;
     if (authFormType == AuthFormType.signIn) {
       _headerText = "Welcome Back";
@@ -265,7 +269,6 @@ class _AuthenticateState extends State<Authenticate> {
       _headerText = "Reset Password";
     } else {
       _headerText = "Register Account";
-
     }
     return AutoSizeText(
       _headerText,
@@ -278,7 +281,8 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  AutoSizeText buildSubHeaderText() { // SubHeader text is built based on form states
+  AutoSizeText buildSubHeaderText() {
+    // SubHeader text is built based on form states
     String _subHeaderText;
     if (authFormType == AuthFormType.signIn) {
       _subHeaderText = "We're happy to see you again!";
@@ -298,7 +302,8 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  List<Widget> buildFields() { // Creates fields based on the form state that is active
+  List<Widget> buildFields() {
+    // Creates fields based on the form state that is active
     List<Widget> textFields = [];
 
     if (authFormType == AuthFormType.resetPassword) {
@@ -321,7 +326,8 @@ class _AuthenticateState extends State<Authenticate> {
     }
 
     // If in register state then add username, email and password fields
-    if ([AuthFormType.register, AuthFormType.convertAnon].contains(AuthFormType)) {
+    if ([AuthFormType.register, AuthFormType.convertAnon]
+        .contains(AuthFormType)) {
       textFields.add(
         TextFormField(
           style: TextStyle(
@@ -387,7 +393,8 @@ class _AuthenticateState extends State<Authenticate> {
     );
   }
 
-  List<Widget> buildBtns() { // Creates btns for based on form
+  List<Widget> buildBtns() {
+    // Creates btns for based on form
     String _switchBtn;
     String _newFormState;
     String _submitBtn;
@@ -406,13 +413,11 @@ class _AuthenticateState extends State<Authenticate> {
       _newFormState = "signIn";
       _submitBtn = "Submit email";
       _showSocialBtns = false;
-    } else if (authFormType == AuthFormType.convertAnon){
+    } else if (authFormType == AuthFormType.convertAnon) {
       _switchBtn = "Back to Home";
       _newFormState = "home";
       _submitBtn = "Register";
-    }
-
-    else {
+    } else {
       _switchBtn = "Already have an account? Sign In";
       _newFormState = "SignIn";
       _submitBtn = "Register";
@@ -483,16 +488,15 @@ class _AuthenticateState extends State<Authenticate> {
           GoogleSignInButton(
             onPressed: () async {
               try {
-
-                if(authFormType == AuthFormType.convertAnon){
-                  await _auth.convertAnonWithGoogle(_email, _password, _username);
+                if (authFormType == AuthFormType.convertAnon) {
+                  await _auth.convertAnonWithGoogle(
+                      _email, _password, _username);
                   await Future.delayed(const Duration(milliseconds: 2000), () {
                     print("Waited 3 seconds");
                   });
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/home", (r) => false);
-                }
-                else {
+                } else {
                   setState(() {
                     _loadingScreen = true;
                   });
