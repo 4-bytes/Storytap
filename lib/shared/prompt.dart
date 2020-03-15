@@ -1,6 +1,8 @@
+// Packages
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
+// *** 
 // A reusable widget for prompt messages and dialogs.
 
 class Prompt extends StatelessWidget {

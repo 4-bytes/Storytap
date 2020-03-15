@@ -1,9 +1,12 @@
+// Packages
 import 'package:flutter/material.dart';
 import 'package:storytap/services/auth.dart';
 
+// *** 
+// Manages the state of authenticated user.
 
 class Provider extends InheritedWidget {
-  final Auth auth;
+  final AuthService auth;
 
   Provider({Key key, Widget child, this.auth}) : super(key: key, child: child);
 

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:storytap/services/auth.dart';
-// List of classes used to validate form fields
+// *** 
+// List of classes used to validate form fields.
 
+// Validates username field
 class UsernameValidator{
   static String validate(String value){
     if (value.isEmpty){
@@ -20,6 +20,7 @@ class UsernameValidator{
   }
 }
 
+// Validates email field
 class EmailValidator{
   static String validate(String value){
     if (value.isEmpty){
@@ -29,7 +30,7 @@ class EmailValidator{
   }
 }
 
-
+// Validates password field
 class PasswordValidator{
   static String validate(String value){
     if (value.isEmpty){
