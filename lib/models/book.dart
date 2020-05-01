@@ -1,8 +1,10 @@
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// A book class that contains the properties of a book.
+
 class Book {
+  String id;
   String title;
   String description;
   String author;
@@ -13,7 +15,9 @@ class Book {
   DateTime creationDate;
 
   Book(
-      {this.title,
+      {
+      this.id,  
+      this.title,
       this.description,
       this.author,
       this.genre,
@@ -34,19 +38,19 @@ class Book {
         'isComplete': false,
       };
 
-  factory Book.fromFirestore(DocumentSnapshot document){
-    Map data = document.data;
 
-    return Book(
-      title: data['bookTitle'],
-      description: data['bookDescription'],
-      author: data['bookAuthor'],
-      genre: data['bookGenre'],
-      cover: data['bookCover'],
-      creationDate: data['bookCreationDate'],
-      lastUpdated: data['lastUpdated'],
-      isComplete: data['isComplete'],
-    );
+  // creates a Book object using snapshot from firestore
+  Book.fromSnapshot(DocumentSnapshot snapshot) :
+      id = snapshot.documentID,
+      title = snapshot['bookTitle'],
+      description = snapshot['bookDescription'],
+      author = snapshot['bookAuthor'],
+      genre = snapshot['bookGenre'],
+      cover = snapshot['bookCover'],
+      creationDate = snapshot['bookCreationDate'].toDate(),
+      lastUpdated = snapshot['bookLastUpdated'].toDate(),
+      isComplete = snapshot['isComplete'];
 
-  }
+
+
 }
