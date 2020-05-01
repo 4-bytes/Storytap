@@ -15,7 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // Shared
 import 'package:storytap/shared/validator.dart';
 // *** 
-// Creates an initial page along with the created book and adds data in cloud firestore.
+// Creates an initial page along with the created book and writes this newly added data to cloud firestore.
 
 class CreateNewPage extends StatefulWidget {
   final Book createdBook;
@@ -32,8 +32,8 @@ class _CreateNewPageState extends State<CreateNewPage> {
   ZefyrController _pageTextController;
   FocusNode _focusNode;
 
-  String _titleErrorMessage;
-  String _zefyrErrorMessage;
+  String _titleErrorMessage; // Displays error text below page title field
+  String _zefyrErrorMessage; // Displays error text below page text
 
   void initState() {
     super.initState();
@@ -50,7 +50,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
       });
       return false;
     }
-    else if (controller.document.length > 20){
+    else if (controller.document.length > 20){ // Length of the page
       setState(() {
           
         _zefyrErrorMessage = "You have exceeded the max length for this document.";
@@ -62,6 +62,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
     }
   }
 
+  // Validates the pageTitle, ensuring that the field is not empty and limited
   bool pageTitleValidator(TextEditingController controller){
     if (controller.text.isEmpty){
       setState(() {
@@ -80,6 +81,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
     }
   }
 
+  // Discards pageTextController after usage
   void dispose(){
     _pageTextController.dispose();
     super.dispose();
@@ -140,7 +142,6 @@ class _CreateNewPageState extends State<CreateNewPage> {
                 ),
                 
                 ZefyrField(
-                    
                   decoration: InputDecoration(errorText: _zefyrErrorMessage),
                   autofocus: false,
                   height: _editorHeight,

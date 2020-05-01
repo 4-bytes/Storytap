@@ -8,7 +8,7 @@ import 'package:storytap/models/book.dart';
 import 'package:storytap/models/page.dart';
 
 // ***
-// A form that creates a new book and navigates to create_new_page screen where additional details are entered.
+// A form that creates a new book and navigates to create_new_page screen where additional page details are entered.
 
 class CreateNewBook extends StatefulWidget {
   final Book book;
