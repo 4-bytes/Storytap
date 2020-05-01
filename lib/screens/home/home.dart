@@ -6,7 +6,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:storytap/shared/provider.dart';
 
 // ***
-// A home screen displayed to users that are authenticated.
+// A home screen displayed to users that are authenticated and users that are not authenticated.
 
 class Home extends StatelessWidget {
 
