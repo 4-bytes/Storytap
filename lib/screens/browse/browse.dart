@@ -28,7 +28,6 @@ class _BrowseState extends State<Browse> {
   @override
   void initState() {
     super.initState();
-    getAllBooks(context);
   }
 
   @override
@@ -47,28 +46,6 @@ class _BrowseState extends State<Browse> {
                     ),
     );
     
-  }
-
-  createBooksList(QuerySnapshot snapshot) async {
-      var docs = snapshot.documents;
-      for (var doc in docs){
-        booksList.add(Book.fromFirestore(doc));
-      }
-    }
-
-
-  getAllBooks(BuildContext context) async* {
-    final uid = await Provider.of(context).auth.getUID();
-    DatabaseService database = DatabaseService(uid: uid);
-    List usersList = await database.usersCollection
-        .getDocuments()
-        .then((val) => val.documents);
-    // usersList.elementAt(i).documentID.toString().collection("books"));
-
-    for (int i = 0; i < usersList.length; i++) {
-      database.usersCollection.document(usersList[i].documentID.toString()).collection("books").snapshots().listen(createBooksList);
-      print(usersList[i].documentID);
-    }
   }
 
 
