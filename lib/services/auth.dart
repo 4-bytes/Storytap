@@ -1,17 +1,23 @@
+// Packages
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+// *** 
+// Holds all firebase auth calls using AuthService.
 
-// Holds all firebase calls using authentication
+class AuthService {
 
-class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 
-  // Get user ID
+  // Get current user's ID
   Future<String> getUID() async {
     return (await _firebaseAuth.currentUser()).uid;
+  }
+
+  Future<String> getUsername() async {
+    return (await _firebaseAuth.currentUser()).displayName;
   }
 
   // Get current user
