@@ -10,7 +10,7 @@ import 'package:storytap/shared/loading.dart';
 
 // *** 
 // Authenticate screen that consists of signIn, register, resetPassword forms, 
-// as well as allowing users to sign in anon and convert to registered users.
+// as well as allowing users to sign in anonymously.
 
 final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
 final secondaryThemeColor = Color(0xFF08212b); // Color(0xFF08212b)
@@ -21,7 +21,7 @@ enum AuthFormType {
   register,
   resetPassword,
   signInAnon,
-  convertAnon
+  convertAnon // Not in use because there is a way to dispose of anon users
 } // Determines signed in or not, changes the state of the forms
 
 class Authenticate extends StatefulWidget {
@@ -64,6 +64,7 @@ class _AuthenticateState extends State<Authenticate> {
     }
   }
 
+  // Validates form fields
   bool validateFields() {
     final form = _formKey.currentState;
     form.save();
@@ -99,7 +100,6 @@ class _AuthenticateState extends State<Authenticate> {
             Navigator.pushNamedAndRemoveUntil(context, "/home", (r) => false);
             break;
           case AuthFormType.register:
-            // TODO: Handle this case.
             break;
           case AuthFormType.resetPassword:
             // Reset password form
@@ -110,7 +110,6 @@ class _AuthenticateState extends State<Authenticate> {
             });
             break;
           case AuthFormType.signInAnon:
-            // TODO: Handle this case.
             break;
           case AuthFormType.convertAnon:
             await auth.convertAnonWithEmail(_email, _password, _username);
