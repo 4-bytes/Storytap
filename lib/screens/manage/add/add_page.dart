@@ -47,10 +47,9 @@ class _AddPageState extends State<AddPage> {
   ];
 
   // Default message
-  String _errorMessage = "A branch has not yet been added to this page"; 
+  String _errorMessage = "A branch has not yet been added to this page";
   String _titleErrorMessage; // Displays error text below page title field
   String _zefyrErrorMessage; // Displays error text below page text
-
 
   // Each branch with the page title that it is selected with
   String branch1PageSelector;
@@ -62,13 +61,13 @@ class _AddPageState extends State<AddPage> {
   String branch2pageID;
   String branch3pageID;
 
-
   // Called when widget is inserted into tree
   void initState() {
     super.initState();
     final document = _loadDocument(); // Load the document
-    _pageTextController = ZefyrController(document); // Assign controller to ZefyrController(document)
-    _focusNode = FocusNode(); 
+    _pageTextController = ZefyrController(
+        document); // Assign controller to ZefyrController(document)
+    _focusNode = FocusNode();
   }
 
   void dispose() {
@@ -94,8 +93,6 @@ class _AddPageState extends State<AddPage> {
     pageTitle.text = "";
   }
 
-
-
   // A stream of all pages snapshot
   Stream<QuerySnapshot> getPages(BuildContext context, String bookid) async* {
     final uid = await Provider.of(context).auth.getUID();
@@ -109,40 +106,38 @@ class _AddPageState extends State<AddPage> {
   }
 
   // Validates the zefyrField, ensuring that the document limit is not reached
-  bool zefyrFieldValidator(ZefyrController controller){
-    if (controller.document.toPlainText().isEmpty){
+  bool zefyrFieldValidator(ZefyrController controller) {
+    if (controller.document.toPlainText().isEmpty) {
       setState(() {
         _zefyrErrorMessage = "The page text cannot be left empty.";
       });
       return false;
-    }
-    else if (controller.document.length > 20){ // Length of the page
+    } else if (controller.document.length > 20) {
+      // Length of the page
       setState(() {
-          
-        _zefyrErrorMessage = "You have exceeded the max length for this document.";
+        _zefyrErrorMessage =
+            "You have exceeded the max length for this document.";
       });
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
 
   // Validates the pageTitle, ensuring that the field is not empty and limited
-  bool pageTitleValidator(TextEditingController controller){
-    if (controller.text.isEmpty){
+  bool pageTitleValidator(TextEditingController controller) {
+    if (controller.text.isEmpty) {
       setState(() {
         _titleErrorMessage = "The page identifier cannot be left empty.";
       });
       return false;
-    }
-    else if (controller.text.length < 3 || controller.text.length > 20){
+    } else if (controller.text.length < 3 || controller.text.length > 20) {
       setState(() {
-        _titleErrorMessage = "The page identifier must be 3 to 20 characters long";
+        _titleErrorMessage =
+            "The page identifier must be 3 to 20 characters long";
       });
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
@@ -153,6 +148,9 @@ class _AddPageState extends State<AddPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[0],
           ),
         ),
@@ -166,6 +164,9 @@ class _AddPageState extends State<AddPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[1],
           ),
         ),
@@ -195,6 +196,7 @@ class _AddPageState extends State<AddPage> {
               ));
             }
             return DropdownButton(
+              hint: Text("Choose a Page"),
               items: pageList,
               onChanged: (value) {
                 setState(() {
@@ -235,6 +237,7 @@ class _AddPageState extends State<AddPage> {
               ));
             }
             return DropdownButton(
+              hint: Text("Choose a Page"),
               items: pageList,
               onChanged: (value) {
                 setState(() {
@@ -277,6 +280,7 @@ class _AddPageState extends State<AddPage> {
               ));
             }
             return DropdownButton(
+              hint: Text("Choose a Page"),
               items: pageList,
               onChanged: (value) {
                 setState(() {
@@ -302,6 +306,9 @@ class _AddPageState extends State<AddPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[2],
           ),
         ),
@@ -458,7 +465,7 @@ class _AddPageState extends State<AddPage> {
               children: <Widget>[
                 TextField(
                   decoration: InputDecoration(
-                      labelText: "Enter Page Title",
+                      labelText: "Page Title:",
                       hintText:
                           "This is a page identifier that only you can see."),
                   maxLength: 15,
@@ -482,11 +489,11 @@ class _AddPageState extends State<AddPage> {
                 FlatButton(
                   padding: const EdgeInsets.only(
                       top: 10, bottom: 10, left: 30, right: 30),
-                  color: secondaryThemeColor,
+                  color: primaryThemeColor,
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text("Add Page"),
+                  child: Text("Add Page", style: TextStyle(fontSize: 20),),
                   onPressed: () async {
                     print("Created a new page");
                     final uid = await Provider.of(context).auth.getUID();
@@ -509,13 +516,9 @@ class _AddPageState extends State<AddPage> {
                               widget.createdBook, widget.createdPage)
                           .then((_) {
                         print("Updated Firestore with new page + no branches");
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
+                        Navigator.pop(context);
                       });
                     } else if (_branchIndex == 1) {
-                      print("hello");
-                      print(_branchTextController[0]);
-                      print(widget.createdBranch[0].text);
                       // Create a new page with 1 branch
                       widget.createdBranch[0].text =
                           _branchTextController[0].text;
@@ -536,12 +539,10 @@ class _AddPageState extends State<AddPage> {
                         await database.createBranchDocument(
                             widget.createdBook.id,
                             widget.createdPage.id,
-                            widget.createdBook,
-                            widget.createdPage,
                             widget.createdBranch[i]);
                       }
                       print("Updated Firestore with new page + 1 branches");
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pop(context);
                       /*await database
                           .createBranchDocument(
                               widget.createdBook.id,
@@ -579,12 +580,10 @@ class _AddPageState extends State<AddPage> {
                         await database.createBranchDocument(
                             widget.createdBook.id,
                             widget.createdPage.id,
-                            widget.createdBook,
-                            widget.createdPage,
                             widget.createdBranch[i]);
                       }
                       print("Updated Firestore with new page + 2 branches");
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pop(context);
                     } else if (_branchIndex == 3) {
                       // Create a new page with 3 branches
                       widget.createdBranch[0].text =
@@ -616,12 +615,10 @@ class _AddPageState extends State<AddPage> {
                         await database.createBranchDocument(
                             widget.createdBook.id,
                             widget.createdPage.id,
-                            widget.createdBook,
-                            widget.createdPage,
                             widget.createdBranch[i]);
                       }
                       print("Updated Firestore with new page + 3 branches");
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.pop(context);
                       // Create branches for the newly created page
                       /* await database
                           .createBranchDocument(

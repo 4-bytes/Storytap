@@ -1,11 +1,16 @@
 // Packages
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 import 'package:storytap/screens/manage/create/create_new_page.dart';
 // Models
 import 'package:storytap/models/book.dart';
 import 'package:storytap/models/page.dart';
+// Services
+import 'package:storytap/services/storage.dart';
 
 // ***
 // A form that creates a new book and navigates to create_new_page screen where additional page details are entered.
@@ -20,12 +25,13 @@ class CreateNewBook extends StatefulWidget {
 }
 
 class _CreateNewBookState extends State<CreateNewBook> {
+
+  // Dropdown button selection
   List<String> _genreSelect = <String>["Fiction", "Non-Fiction"];
   var _genreSelected = "Fiction";
 
   List<String> _subGenres1 = <String>[
     "Classic",
-    "Detective",
     "Fantasy",
     "Historical",
     "Mystery",
@@ -45,10 +51,12 @@ class _CreateNewBookState extends State<CreateNewBook> {
   var _subGenreSelected2 = "Biography";
   var _finalSelected = "Classic";
 
+  // TextControllers for title and description
   TextEditingController _bookTitleController = new TextEditingController();
   TextEditingController _bookDescriptionController =
       new TextEditingController();
 
+  // The error messages to display when an error occurs
   String _bookTitleErrorMessage;
   String _bookDescriptionErrorMessage;
 
@@ -108,7 +116,7 @@ class _CreateNewBookState extends State<CreateNewBook> {
           },
           value: _subGenreSelected1,
           isExpanded: false,
-        )
+        ),
       ],
     );
   }
@@ -155,8 +163,11 @@ class _CreateNewBookState extends State<CreateNewBook> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     Page page = new Page(book: widget.book, text: "");
-    print(_finalSelected);
+
 
     return Scaffold(
       appBar: AppBar(
@@ -242,26 +253,26 @@ class _CreateNewBookState extends State<CreateNewBook> {
               FlatButton(
                 padding: const EdgeInsets.only(
                     top: 10, bottom: 10, left: 30, right: 30),
-                color: secondaryThemeColor,
+                color: primaryThemeColor,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40)),
-                child: Text("Continue"),
-                onPressed: () {
-                  if (validateBookTitle(_bookTitleController) && validateBookDescription(_bookDescriptionController)){
-                  widget.book.title = _bookTitleController.text;
-                  widget.book.description = _bookDescriptionController.text;
-                  widget.book.genre = _finalSelected;
-                  widget.book.creationDate = DateTime.now();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CreateNewPage(
-                                createdBook: widget.book,
-                                createdPage: page,
-                              )));
-                  }
-                  else {
+                child: Text("Continue", style: TextStyle(fontSize: 20),),
+                onPressed: () async {
+                  if (validateBookTitle(_bookTitleController) &&
+                      validateBookDescription(_bookDescriptionController)) {
+                    widget.book.title = _bookTitleController.text;
+                    widget.book.description = _bookDescriptionController.text;
+                    widget.book.genre = _finalSelected;
+                    widget.book.creationDate = DateTime.now();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CreateNewPage(
+                                  createdBook: widget.book,
+                                  createdPage: page,
+                                )));
+                  } else {
                     print("Error");
                   }
                 },

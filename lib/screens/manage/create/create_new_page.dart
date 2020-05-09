@@ -1,9 +1,12 @@
 // Packages
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:storytap/services/storage.dart';
 import 'package:storytap/shared/provider.dart';
 import 'package:zefyr/zefyr.dart';
 import 'package:quill_delta/quill_delta.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 // Models
@@ -14,24 +17,31 @@ import 'package:storytap/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // Shared
 import 'package:storytap/shared/validator.dart';
-// *** 
+// ***
 // Creates an initial page along with the created book and writes this newly added data to cloud firestore.
 
 class CreateNewPage extends StatefulWidget {
   final Book createdBook;
   final Page createdPage;
 
-  CreateNewPage({Key key, @required this.createdBook, @required this.createdPage})
-      : super(key: key);
+  CreateNewPage({
+    Key key,
+    @required this.createdBook,
+    @required this.createdPage,
+  }) : super(key: key);
   @override
   _CreateNewPageState createState() => _CreateNewPageState();
 }
 
 class _CreateNewPageState extends State<CreateNewPage> {
+  File renamedBookCover; // Holds the renamed book cover file
+
+  // Text controllers
   TextEditingController _pageTitleController = new TextEditingController();
   ZefyrController _pageTextController;
   FocusNode _focusNode;
 
+  // Error messages
   String _titleErrorMessage; // Displays error text below page title field
   String _zefyrErrorMessage; // Displays error text below page text
 
@@ -43,56 +53,56 @@ class _CreateNewPageState extends State<CreateNewPage> {
   }
 
   // Validates the zefyrField, ensuring that the document limit is not reached
-  bool zefyrFieldValidator(ZefyrController controller){
-    if (controller.document.toPlainText().isEmpty){
+  bool zefyrFieldValidator(ZefyrController controller) {
+    if (controller.document.toPlainText().isEmpty) {
       setState(() {
         _zefyrErrorMessage = "The page text cannot be left empty.";
       });
       return false;
-    }
-    else if (controller.document.length > 20){ // Length of the page
+    } else if (controller.document.length > 400) {
+      // Length of the page
       setState(() {
-          
-        _zefyrErrorMessage = "You have exceeded the max length for this document.";
+        _zefyrErrorMessage =
+            "You have exceeded the max length for this document.";
       });
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
 
   // Validates the pageTitle, ensuring that the field is not empty and limited
-  bool pageTitleValidator(TextEditingController controller){
-    if (controller.text.isEmpty){
+  bool pageTitleValidator(TextEditingController controller) {
+    if (controller.text.isEmpty) {
       setState(() {
         _titleErrorMessage = "The page identifier cannot be left empty.";
       });
       return false;
-    }
-    else if (controller.text.length < 3 || controller.text.length > 20){
+    } else if (controller.text.length < 3 || controller.text.length > 20) {
       setState(() {
-        _titleErrorMessage = "The page identifier must be 3 to 20 characters long";
+        _titleErrorMessage =
+            "The page identifier must be 3 to 20 characters long";
       });
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
 
   // Discards pageTextController after usage
-  void dispose(){
+  void dispose() {
     _pageTextController.dispose();
     super.dispose();
   }
 
+  // Default placeholder text
   NotusDocument _loadDocument() {
     final Delta delta = Delta()
       ..insert("Tap here to begin writing your first page...\n");
     return NotusDocument.fromDelta(delta);
   }
 
+  // Clears the page text
   void _clearDocument(ZefyrController controller) {
     try {
       controller.replaceText(0, controller.document.length - 1,
@@ -102,7 +112,8 @@ class _CreateNewPageState extends State<CreateNewPage> {
     }
   }
 
-  void _clearTitle(TextEditingController pageTitle){
+  // Clears the page title
+  void _clearTitle(TextEditingController pageTitle) {
     pageTitle.text = "";
   }
 
@@ -124,7 +135,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
           )
         ],
         backgroundColor: primaryThemeColor,
-        title: Text("Create Page"),
+        title: Text("Create Starting Page"),
       ),
       body: ZefyrScaffold(
         child: Padding(
@@ -135,12 +146,12 @@ class _CreateNewPageState extends State<CreateNewPage> {
                 TextField(
                   decoration: InputDecoration(
                       labelText: "Enter Page Title",
-                      hintText: "This is a page identifier that only you can see."),
+                      hintText:
+                          "This is a page identifier that only you can see."),
                   maxLength: 15,
                   controller: _pageTitleController,
                   autofocus: true,
                 ),
-                
                 ZefyrField(
                   decoration: InputDecoration(errorText: _zefyrErrorMessage),
                   autofocus: false,
@@ -149,39 +160,47 @@ class _CreateNewPageState extends State<CreateNewPage> {
                   controller: _pageTextController,
                   focusNode: _focusNode,
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 FlatButton(
-                  padding: const EdgeInsets.only(
-                      top: 10, bottom: 10, left: 30, right: 30),
-                  color: secondaryThemeColor,
+                  color: primaryThemeColor,
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text("Create"),
+                  child: Text("Create", style: TextStyle(fontSize: 20),),
                   onPressed: () async {
-                    if (zefyrFieldValidator(_pageTextController) && pageTitleValidator(_pageTitleController)){
-                    print("Testsda");
-                    final uid = await Provider.of(context).auth.getUID();
-                    final username = await Provider.of(context).auth.getUsername();
-                    final database = DatabaseService(uid: uid);
-                    print("test");
-                    // Updating createdBook properties
-                    widget.createdBook.lastUpdated = DateTime.now();
-                    widget.createdBook.author = username;
-                    // Updating createdPage properties
-                    widget.createdPage.title = _pageTitleController.text;
-                    widget.createdPage.text = jsonEncode(_pageTextController.document); // Converts values into JSON string
-                    widget.createdPage.lastUpdated = DateTime.now();
-                    widget.createdPage.initial = true;
-                    // Creates a subcollection under the "users" and creates a new collection "books" too
-                    await database.createBookDocument(widget.createdBook, widget.createdPage).then( (_){
-                      print("Updated Firestore with new data");
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    });
-                    }
-                    else {
+                    if (zefyrFieldValidator(_pageTextController) &&
+                        pageTitleValidator(_pageTitleController)) {
+                      final uid = await Provider.of(context).auth.getUID();
+                      final username =
+                          await Provider.of(context).auth.getUsername();
+                      final database = DatabaseService(uid: uid);
+                      // Updating createdBook properties
+                      widget.createdBook.lastUpdated = DateTime.now();
+                      widget.createdBook.author = username;
+                      // Updating createdPage properties
+                      widget.createdPage.title = _pageTitleController.text;
+                      widget.createdPage.text = jsonEncode(_pageTextController
+                          .document); // Converts values into JSON string
+                      widget.createdPage.lastUpdated = DateTime.now();
+                      widget.createdPage.initial = true;
+                      // Creates a subcollection under the "users" with base book details
+                      await database
+                          .createBookDocument(
+                              widget.createdBook, widget.createdPage, username)
+                          .then((id) {
+                        database.updateBookCover(uid, id, "defaultcover.png");
+                        // Set the path to default in storage
+
+                        print("Created new book");
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                      });
+                    } else {
                       print("Max length");
                     }
-                    
+
                     //database.createBookDocument(
                     //    widget.createdBook.title,
                     //    widget.createdBook.description,
@@ -191,13 +210,10 @@ class _CreateNewPageState extends State<CreateNewPage> {
                     //    widget.createdBook.creationDate,
                     //    widget.createdBook.lastUpdated);
 
-
-
                     // await Firestore.instance.collection("test").add({
                     //  'pageText': widget.createdPage.text,
                     //  'pageUpdated': widget.createdPage.lastUpdated,
                     //}).then((_) {
-                    
 
                     // print("JSON: ");
                     // print(_pageTextController.document.toJson());
