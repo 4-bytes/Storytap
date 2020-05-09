@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 // Shared
 import 'package:storytap/shared/prompt.dart';
 
-// Welcome screen that is displayed when the user is not signed in
+// Welcome screen that is displayed when the user is not authenticated.
 
 class Welcome extends StatelessWidget {
   final primaryThemeColor = Color(0xFF0C3241); // Color(0xFF0C3241) old
