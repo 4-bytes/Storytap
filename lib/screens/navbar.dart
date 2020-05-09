@@ -10,10 +10,12 @@ import 'package:storytap/screens/profile/profile.dart';
 import 'package:storytap/screens/settings/settings.dart';
 import 'package:storytap/screens/manage/create/create_new_book.dart';
 import 'package:storytap/screens/authenticate/authenticate.dart';
+// Shared
+import 'package:storytap/shared/provider.dart';
 // Models
 import 'package:storytap/models/book.dart';
 
-// *** 
+// ***
 // A widget that manages navigation using bottom and top appbar icons.
 
 class NavigationBar extends StatefulWidget {
@@ -21,14 +23,17 @@ class NavigationBar extends StatefulWidget {
   _NavigationBar createState() => _NavigationBar();
 }
 
-class _NavigationBar extends State<NavigationBar> { // Manages state of different objects
+class _NavigationBar extends State<NavigationBar> {
+  // Manages state of different objects
   int _currentIndex = 0;
   bool _clickedCenterBtn = false;
-  String _text = "Home";
-  String _titleText = "Home";
+  String _text = "Home"; // Button text
+  String _titleText = "Home"; // Initial starting screen title text
   Color bgColor = primaryThemeColor;
+  bool isAnon; // Keep a state if the user is anonymous
   List<Widget> _appBarWidgets;
   final List<Widget> _screens = [
+    // List of the 5 main primary screens
     Home(), // Home screen
     Browse(), // Browse books
     Manage(), // Manage user books (create, edit, delete)
@@ -36,8 +41,25 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
     Settings(), // Settings
   ];
 
+  // Called when the object is added to widget tree, determine whether the authenticated user is anonymous or not
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isAnonymous();
+    });
+  }
+
+  // A widget that displays app bar icons top of the screen
   List<Widget> appBarIcons(BuildContext context) {
-    final newBook = new Book(title: "", cover: "", creationDate: DateTime.now(), description: "", genre: "", isComplete: false, lastUpdated: DateTime.now(), author: "");
+    final newBook = new Book(
+        title: "",
+        cover: "",
+        creationDate: DateTime.now(),
+        description: "",
+        genre: "",
+        isComplete: false,
+        lastUpdated: DateTime.now(),
+        author: "");
     // Return  appBar icons based on current tab
     if (_currentIndex == 0) {
       // Home
@@ -59,26 +81,36 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
     } else if (_currentIndex == 2) {
       // Create
       setState(() {
-        _appBarWidgets = <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => CreateNewBook(book: newBook)));
-            },
-          ),
-        ];
+        if (isAnon == true) {
+          _appBarWidgets = <Widget>[];
+        } else {
+          _appBarWidgets = <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateNewBook(book: newBook)));
+              },
+            ),
+          ];
+        }
       });
       return _appBarWidgets;
     } else if (_currentIndex == 3) {
       // Profile
       setState(() {
-        _appBarWidgets = <Widget>[
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {},
-          )
-        ];
+        if (isAnon == true) {
+          _appBarWidgets = <Widget>[];
+        } else {
+          _appBarWidgets = <Widget>[
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {},
+            )
+          ];
+        }
       });
       return _appBarWidgets;
     } else if (_currentIndex == 4) {
@@ -86,10 +118,11 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
 
       setState(() {
         _appBarWidgets = <Widget>[
-          IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed:
-                  () {}), /* async {
+          //IconButton(
+          //    icon: Icon(Icons.exit_to_app),
+          //    onPressed:
+          //        () {}),
+          /* async {
             try {
                   Auth auth = Provider.of(context).auth;
                   await auth.signOut();
@@ -143,7 +176,7 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
                 bgColor = primaryThemeColor; // Colors.blueGrey[300];
               });
             }
-            updateTabSelection(2, "My Created Books", "My Created Books");
+            updateTabSelection(2, "Created Books", "Created Books");
             // _clickedCenterBtn = !_clickedCenterBtn; //to update the animated container
           });
         },
@@ -227,7 +260,7 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
                     }
                   });
                   updateTabSelection(3, "Profile", "Profile");
-                  Navigator.of(context).pushNamed('/convertAnon');
+                  // Navigator.of(context).pushNamed('/convertAnon');
                 },
                 iconSize: 27.0,
                 icon: Icon(
@@ -266,5 +299,19 @@ class _NavigationBar extends State<NavigationBar> { // Manages state of differen
         //color of the BottomAppBar
       ),
     );
+  }
+
+  // Checks if the currently signed in user is anonymous or not
+  void isAnonymous() async {
+    final result = await Provider.of(context).auth.isAnon();
+    if (result == true) {
+      setState(() {
+        isAnon = true;
+      });
+    } else {
+      setState(() {
+        isAnon = false;
+      });
+    }
   }
 }
