@@ -16,8 +16,14 @@ class AuthService {
     return (await _firebaseAuth.currentUser()).uid;
   }
 
+  // Get current user's
   Future<String> getUsername() async {
     return (await _firebaseAuth.currentUser()).displayName;
+  }
+
+  // Get current user
+  Future getUserPhotoURL() async {
+    return (await _firebaseAuth.currentUser()).photoUrl;
   }
 
   // Get current user
