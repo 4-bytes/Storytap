@@ -27,12 +27,12 @@ class Home extends StatelessWidget {
       }
     }
 
-
+  // Displays a personalised greeting widget to the user
   Widget displayHomeGreeting(context, snapshot){
     final user = snapshot.data;
     String message = timeOfDay();
     return Column(children: <Widget>[
-      ListTile(title: AutoSizeText(message +" ${user.displayName ?? ''}"),)
+      ListTile(title: Text(message +" ${user.displayName ?? ''}", style: TextStyle(fontSize: 24),), )
     ],) ;
 
   }
