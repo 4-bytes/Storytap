@@ -3,6 +3,7 @@ import 'book.dart';
 import 'branch.dart';
 
 // A book can have pages, these of are of two types: initial page and other pages.
+// A page represents page information and may contain a set number of branches.
 
 class Page {
   Book book;

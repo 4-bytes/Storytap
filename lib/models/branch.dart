@@ -1,7 +1,6 @@
 // Models
-import 'page.dart';
 
-// A page has the option of having branches. 
+// A page has the option of having branches. A branch represents a link to another page. 
 
 class Branch{ 
   String id; // The branch's unique ID
