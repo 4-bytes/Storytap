@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/material.dart';
 import 'package:storytap/screens/authenticate/authenticate.dart';
 import 'package:storytap/shared/provider.dart';
 import 'package:zefyr/zefyr.dart';
@@ -30,7 +29,7 @@ class EditPage extends StatefulWidget {
       this.editedPage,
       this.editedBranch,
       this.branchesLength})
-      : super(key: key);
+      : super(key: key); // Init constructor with values
 
   @override
   _EditPageState createState() => _EditPageState();
@@ -49,7 +48,7 @@ class _EditPageState extends State<EditPage> {
   ];
 
   // Default message
-  String _errorMessage = "A branch has not yet been added to this page";
+  String _errorMessage = "";
 
   // Each branch with the page that it is selected with
   String branch1PageSelector;
@@ -68,34 +67,49 @@ class _EditPageState extends State<EditPage> {
   void initState() {
     super.initState();
     final document = _loadDocument(); // Load the pageText
-    
+    print(widget.editedBranch[0].text);
+    print(widget.editedBranch[0].pageID);
     setState(() {
       _branchIndex = widget.branchesLength; // Get the number of active branches
     });
     _pageTextController = ZefyrController(document);
+    _pageTitleController.text =
+        widget.editedPage.title; // Load the title from widget.editedTitle.title
     _focusNode = FocusNode();
 
     if (_branchIndex == 0) {
+      setState(() {
+        _errorMessage = "A branch has not yet been added to this page";
+      });
     } else if (_branchIndex == 1) {
       _branchTextController[0].text = widget.editedBranch[0].text;
       setState(() {
         branch1PageSelector = widget.editedBranch[0].pageTitle;
+        branch1pageID = widget.editedBranch[0].pageID;
       });
+      print(_branchTextController[0].text);
+      print(widget.editedBranch[0].pageTitle);
     } else if (_branchIndex == 2) {
       _branchTextController[0].text = widget.editedBranch[0].text;
       _branchTextController[1].text = widget.editedBranch[1].text;
       setState(() {
         branch1PageSelector = widget.editedBranch[0].pageTitle;
         branch2PageSelector = widget.editedBranch[1].pageTitle;
+        branch1pageID = widget.editedBranch[0].pageID;
+        branch2pageID = widget.editedBranch[1].pageID;
       });
     } else if (_branchIndex == 3) {
       _branchTextController[0].text = widget.editedBranch[0].text;
       _branchTextController[1].text = widget.editedBranch[1].text;
       _branchTextController[2].text = widget.editedBranch[2].text;
       setState(() {
+        _errorMessage = "You have added the maximum number of branches";
         branch1PageSelector = widget.editedBranch[0].pageTitle;
         branch2PageSelector = widget.editedBranch[1].pageTitle;
         branch3PageSelector = widget.editedBranch[2].pageTitle;
+        branch1pageID = widget.editedBranch[0].pageID;
+        branch2pageID = widget.editedBranch[1].pageID;
+        branch3pageID = widget.editedBranch[2].pageID;
       });
     }
   }
@@ -105,6 +119,9 @@ class _EditPageState extends State<EditPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[0],
           ),
         ),
@@ -118,6 +135,9 @@ class _EditPageState extends State<EditPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[1],
           ),
         ),
@@ -131,6 +151,9 @@ class _EditPageState extends State<EditPage> {
       children: <Widget>[
         Flexible(
           child: TextField(
+            decoration: InputDecoration(
+              labelText: "Branch Text:",
+            ),
             controller: _branchTextController[2],
           ),
         ),
@@ -281,7 +304,7 @@ class _EditPageState extends State<EditPage> {
         _zefyrErrorMessage = "The page text cannot be left empty.";
       });
       return false;
-    } else if (controller.document.length > 20) {
+    } else if (controller.document.length > 400) {
       setState(() {
         _zefyrErrorMessage =
             "You have exceeded the max length for this document.";
@@ -323,15 +346,17 @@ class _EditPageState extends State<EditPage> {
 
   void _clearDocument(ZefyrController controller) {
     try {
-      controller.replaceText(0, controller.document.length - 1,
-          'Tap here to begin writing your first page...\n');
+      controller.replaceText(
+          0, controller.document.length - 1, 'Tap here to begin writing...\n');
     } catch (error) {
       print(error);
     }
   }
 
   void _clearTitle(TextEditingController pageTitle) {
-    pageTitle.text = "";
+    setState(() {
+      pageTitle.text = "";
+    });
   }
 
   Widget createBranch(BuildContext context, String bookid) {
@@ -454,25 +479,123 @@ class _EditPageState extends State<EditPage> {
     );
   }
 
+  Widget displayDeleteIcon() {
+    if (widget.editedPage.initial == true) {
+      return Visibility(
+        child: Icon(Icons.ac_unit),
+        visible: false,
+      );
+    } else {
+      return IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          showPrompt(context, "Delete");
+        },
+      );
+    }
+  }
+
+  void showPrompt(BuildContext context, String title) {
+    // Prompt that is displayed based on what icon button is pressed
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          if (title == "Reset") {
+            return AlertDialog(
+              title: Text("Erase data?"),
+              content: Text("Do you want to erase all data on this page?"),
+              actions: <Widget>[
+                FlatButton(
+                  color: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  color: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                  child: Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    _clearTitle(_pageTitleController);
+                    _clearDocument(_pageTextController);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          } else {
+            return AlertDialog(
+              title: Text("Delete this page?"),
+              content: Text(
+                  "This will delete all information including all branches."),
+              actions: <Widget>[
+                FlatButton(
+                  color: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  color: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                  child: Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    Navigator.pop(
+                        context); // Pop twice to return back to editBook screen, safer to pop first before deleting page
+                    final uid = await Provider.of(context).auth.getUID();
+                    final database = DatabaseService(uid: uid);
+                    await database.deleteBranch(
+                        uid, widget.editedBook.id, widget.editedPage.id);
+                    await database.deleteSinglePage(
+                        uid, widget.editedBook.id, widget.editedPage.id);
+                    await database.deleteBrokenBranches(
+                        uid, widget.editedBook.id, widget.editedPage.id);
+                  },
+                ),
+              ],
+            );
+          }
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    _pageTitleController.text = widget.editedPage.title;
     double _height = MediaQuery.of(context).size.height;
     double _editorHeight = _height * 0.65;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.restore_page),
-            onPressed: () {
-              _clearTitle(_pageTitleController);
-              _clearDocument(_pageTextController);
-            },
-          )
+          // IconButton(icon: Icon(Icons.restore_page),onPressed: () { showPrompt(context, "Reset");},),
+          displayDeleteIcon(),
         ],
         backgroundColor: primaryThemeColor,
-        title: Text("Edit Page"),
+        title: Text("Edit " + widget.editedPage.title),
       ),
       body: ZefyrScaffold(
         child: Padding(
@@ -482,7 +605,7 @@ class _EditPageState extends State<EditPage> {
               children: <Widget>[
                 TextField(
                   decoration: InputDecoration(
-                      labelText: "Enter Page Title",
+                      labelText: "Page Title:",
                       hintText:
                           "This is a page identifier that only you can see."),
                   maxLength: 15,
@@ -507,20 +630,18 @@ class _EditPageState extends State<EditPage> {
                 FlatButton(
                   padding: const EdgeInsets.only(
                       top: 10, bottom: 10, left: 30, right: 30),
-                  color: secondaryThemeColor,
+                  color: primaryThemeColor,
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text("Save changes"),
+                  child: Text("Save", style: TextStyle(fontSize: 20),),
                   onPressed: () async {
                     if (zefyrFieldValidator(_pageTextController) &&
                         pageTitleValidator(_pageTitleController)) {
-                      print("Testsda");
                       final uid = await Provider.of(context).auth.getUID();
                       final username =
                           await Provider.of(context).auth.getUsername();
                       final database = DatabaseService(uid: uid);
-                      print(widget.editedPage.text);
                       // Updating createdBook properties
                       widget.editedBook.lastUpdated = DateTime.now();
                       widget.editedBook.author = username;
@@ -530,7 +651,130 @@ class _EditPageState extends State<EditPage> {
                           .document); // Converts values into JSON string
                       widget.editedPage.lastUpdated = DateTime.now();
                       // Creates a subcollection under the "users" and creates a new collection "books" too
+                      print(_branchIndex.toString() + " IS BRANCH");
+                      if (_branchIndex == 0) {
+                        // Delete all existing branches and don't add any branches
+                        database.deleteBranch(
+                            uid, widget.editedBook.id, widget.editedPage.id);
 
+                        // Update page details
+                        await database.updatePageDetails(
+                            uid,
+                            widget.editedBook.id,
+                            widget.editedPage.id,
+                            widget.editedPage);
+                        Navigator.pop(context);
+                      } else if (_branchIndex == 1) {
+                        // Delete existing branches
+                        database.deleteBranch(
+                            uid, widget.editedBook.id, widget.editedPage.id);
+
+                        // Set the editedBranch's values to the input values from fields
+                        widget.editedBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.editedBranch[0].number = 1;
+                        widget.editedBranch[0].pageID = branch1pageID;
+                        widget.editedBranch[0].pageTitle = branch1PageSelector;
+
+                        // Update page details
+                        await database.updatePageDetails(
+                            uid,
+                            widget.editedBook.id,
+                            widget.editedPage.id,
+                            widget.editedPage);
+
+                        // Loop through each branch and update Firestore with new values
+                        for (int i = 0; i < _branchIndex; i++) {
+                          await database.createBranchDocument(
+                              widget.editedBook.id,
+                              widget.editedPage.id,
+                              widget.editedBranch[i]);
+                          print("Added 1 branch");
+                        }
+                        print("Updated Firestore with new page + 1 branches");
+                        Navigator.pop(context);
+                        // Add branch 1 to book
+                      } else if (_branchIndex == 2) {
+                        // Delete existing branches
+                        database.deleteBranch(
+                            uid, widget.editedBook.id, widget.editedPage.id);
+
+                        // Set the editedBranch's values to the input values from fields
+                        widget.editedBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.editedBranch[0].number = 1;
+                        widget.editedBranch[0].pageID = branch1pageID;
+                        widget.editedBranch[0].pageTitle = branch1PageSelector;
+
+                        widget.editedBranch[1].text =
+                            _branchTextController[1].text;
+                        widget.editedBranch[1].number = 2;
+                        widget.editedBranch[1].pageID = branch2pageID;
+                        widget.editedBranch[1].pageTitle = branch2PageSelector;
+
+                        // Update page details
+                        await database.updatePageDetails(
+                            uid,
+                            widget.editedBook.id,
+                            widget.editedPage.id,
+                            widget.editedPage);
+
+                        // Loop through each branch and update Firestore with new values
+                        for (int i = 0; i < _branchIndex; i++) {
+                          print(widget.editedBranch[i].pageTitle);
+                          await database.createBranchDocument(
+                              widget.editedBook.id,
+                              widget.editedPage.id,
+                              widget.editedBranch[i]);
+                          print("Added 2 branches");
+                        }
+
+                        // Save branches to database
+
+                        Navigator.pop(context);
+                        // Add brach 2 to book
+                      } else if (_branchIndex == 3) {
+                        // Delete existing branches
+                        database.deleteBranch(
+                            uid, widget.editedBook.id, widget.editedPage.id);
+
+                        // Set the editedBranch's values to the input values from fields
+                        widget.editedBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.editedBranch[0].number = 1;
+                        widget.editedBranch[0].pageID = branch1pageID;
+                        widget.editedBranch[0].pageTitle = branch1PageSelector;
+
+                        widget.editedBranch[1].text =
+                            _branchTextController[1].text;
+                        widget.editedBranch[1].number = 2;
+                        widget.editedBranch[1].pageID = branch2pageID;
+                        widget.editedBranch[1].pageTitle = branch2PageSelector;
+
+                        widget.editedBranch[2].text =
+                            _branchTextController[2].text;
+                        widget.editedBranch[2].number = 3;
+                        widget.editedBranch[2].pageID = branch3pageID;
+                        widget.editedBranch[2].pageTitle = branch3PageSelector;
+
+                        // Update page details
+                        await database.updatePageDetails(
+                            uid,
+                            widget.editedBook.id,
+                            widget.editedPage.id,
+                            widget.editedPage);
+
+                        // Loop through each branch and update Firestore with new values
+                        for (int i = 0; i < _branchIndex; i++) {
+                          await database.createBranchDocument(
+                              widget.editedBook.id,
+                              widget.editedPage.id,
+                              widget.editedBranch[i]);
+                          print("Added 3 branches");
+                        }
+
+                        Navigator.pop(context);
+                      }
                     } else {
                       print("Max length");
                     }
