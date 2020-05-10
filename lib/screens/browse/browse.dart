@@ -233,7 +233,7 @@ class _BrowseState extends State<Browse> {
     return new Container(
       padding: EdgeInsets.all(16.0),
       child: Card(
-        color: Colors.blueGrey[300],
+        color: Colors.blueGrey[100],
         child: InkWell(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
