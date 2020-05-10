@@ -19,12 +19,10 @@ class DatabaseService {
   final CollectionReference booksCollection =
       Firestore.instance.collection("books");
 
-
-
-
   // ** Create Functions
   // Creates a new book document in the usersCollection and also creates a new collection "books" separately
   Future createBookDocument(Book book, Page page, String username) async {
+    // Use the uid to keep the book under that user specifically
     DocumentReference bookid =
         await usersCollection.document(uid).collection("books").add({
       'bookTitle': book.title,
@@ -35,15 +33,16 @@ class DatabaseService {
       'bookLastUpdated': book.lastUpdated,
       'isComplete': false,
     });
-    await createPageDocument(bookid.documentID, book, page);
-    await createBookCollection(
-        book, bookid.documentID, uid, username); // Other bookCollection
-    // createPageDocument(bookid, pageTitle, pageText, lastUpdated)
+    await createPageDocument(
+        bookid.documentID, book, page); // Create starting page
+    await createBookCollection(book, bookid.documentID, uid,
+        username); // Store book details in other bookCollection
     return bookid.documentID;
   }
 
   // Creates a separate bookCollection which references the user that created that book and allows faster querying (less reads usage)
-  Future createBookCollection(Book book, String bookid, String uid, String username) async {
+  Future createBookCollection(
+      Book book, String bookid, String uid, String username) async {
     await booksCollection.document(bookid).setData({
       'bookTitle': book.title,
       'bookDescription': book.description,
@@ -53,7 +52,7 @@ class DatabaseService {
       'bookLastUpdated': book.lastUpdated,
       'isComplete': false,
       'author': uid,
-      'username' : username,
+      'username': username,
     });
   }
 
@@ -142,21 +141,36 @@ class DatabaseService {
     return await document2.updateData({'isComplete': val});
   }
 
-
   // Updates the page's details
-  Future updatePageDetails(String uid, String bookid, String pageid, Page page) async {
-    final document = usersCollection.document(uid).collection("books").document(bookid).collection("pages").document(pageid);
-    return await document.updateData({'pageTitle' : page.title, 'pageText' : page.text, 'pageLastUpdated' : page.lastUpdated});
+  Future updatePageDetails(
+      String uid, String bookid, String pageid, Page page) async {
+    final document = usersCollection
+        .document(uid)
+        .collection("books")
+        .document(bookid)
+        .collection("pages")
+        .document(pageid);
+    return await document.updateData({
+      'pageTitle': page.title,
+      'pageText': page.text,
+      'pageLastUpdated': page.lastUpdated
+    });
   }
-
 
   // ** Delete Functions
   // Deletes all branches from a page
   Future deleteBranch(String uid, String bookid, String pageid) async {
     // Get all branch documents
-    final branches = usersCollection.document(uid).collection("books").document(bookid).collection("pages").document(pageid).collection("branches").getDocuments();
-    branches.then((snapshot){
-      for (DocumentSnapshot doc in snapshot.documents){
+    final branches = usersCollection
+        .document(uid)
+        .collection("books")
+        .document(bookid)
+        .collection("pages")
+        .document(pageid)
+        .collection("branches")
+        .getDocuments();
+    branches.then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.documents) {
         doc.reference.delete(); // Deletes each one individually
       }
     });
@@ -166,36 +180,59 @@ class DatabaseService {
   // Deletes a single page also ensures that if it contains any branches those are deleted too
   Future deleteSinglePage(String uid, String bookid, String pageid) async {
     // Get the page document
-    final page = usersCollection.document(uid).collection("books").document(bookid).collection("pages").document(pageid); 
+    final page = usersCollection
+        .document(uid)
+        .collection("books")
+        .document(bookid)
+        .collection("pages")
+        .document(pageid);
     deleteBranch(uid, bookid, page.documentID); // Delete its branches
     return await page.delete(); // Delete the page itself
   }
 
-  // Deletes broken branches for a single page that has been removed 
-  Future deleteBrokenBranches(String uid, String bookid, String brokenPageID) async {
-    final pages = usersCollection.document(uid).collection("books").document(bookid).collection("pages").getDocuments();
+  // Deletes broken branches for a single page that has been removed
+  Future deleteBrokenBranches(
+      String uid, String bookid, String brokenPageID) async {
+    final pages = usersCollection // First retrive all page documents from the current book
+        .document(uid)
+        .collection("books")
+        .document(bookid)
+        .collection("pages")
+        .getDocuments();
     pages.then((snapshot) {
-      for (DocumentSnapshot page in snapshot.documents){
-        final branches = usersCollection.document(uid).collection("books").document(bookid).collection("pages").document(page.documentID).collection("branches").getDocuments();
-        branches.then( (snapshot2) {
-          for (DocumentSnapshot branch in snapshot2.documents){
-            if (branch.data['branchPageReference'] == brokenPageID){
+      for (DocumentSnapshot page in snapshot.documents) { // Loop through each page
+        final branches = usersCollection
+            .document(uid)
+            .collection("books")
+            .document(bookid)
+            .collection("pages")
+            .document(page.documentID)
+            .collection("branches")
+            .getDocuments();
+        branches.then((snapshot2) {
+          for (DocumentSnapshot branch in snapshot2.documents) {
+            // If a branch's branchPageReference is the same as broken ID then delete the branch
+            if (branch.data['branchPageReference'] == brokenPageID) {
               branch.reference.delete();
             }
           }
-        }); 
+        });
       }
     });
-    
-
   }
 
-  // Deletes all pages only used when the book delete function is called 
+  // Deletes all pages only used when the book delete function is called
   Future deleteAllPages(String uid, String bookid) async {
-    final pages = usersCollection.document(uid).collection("books").document(bookid).collection("pages").getDocuments();
-    pages.then((snapshot){
-      for (DocumentSnapshot doc in snapshot.documents){
-        deleteBranch(uid, bookid, doc.documentID); // Deletes all branches from the page
+    final pages = usersCollection
+        .document(uid)
+        .collection("books")
+        .document(bookid)
+        .collection("pages")
+        .getDocuments();
+    pages.then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.documents) {
+        deleteBranch(
+            uid, bookid, doc.documentID); // Deletes all branches from the page
         doc.reference.delete(); // Deletes the page itself
       }
     });
@@ -203,17 +240,22 @@ class DatabaseService {
 
   // Deletes a book in both collections
   Future deleteBook(String uid, String bookid) async {
-    final usersCollectionRef = usersCollection.document(uid).collection("books").document(bookid); // Get the doc ref in usersCollection
-    final booksCollectionRef = booksCollection.document(bookid); // Get the doc ref in booksCollection
+    final usersCollectionRef = usersCollection
+        .document(uid)
+        .collection("books")
+        .document(bookid); // Get the doc ref in usersCollection
+    final booksCollectionRef =
+        booksCollection.document(bookid); // Get the doc ref in booksCollection
     await usersCollectionRef.delete(); // Delete it from usersCollection
     return await booksCollectionRef.delete(); // Delete it from booksCollection
   }
 
   // A function that deletes everything from a book includes pages and branches
   Future deleteCreatedBook(String uid, String bookid) async {
-    await deleteAllPages(uid, bookid); // First delete all pages including branches
-    return await deleteBook(uid, bookid); // Then delete the book from both collections
-
+    await deleteAllPages(
+        uid, bookid); // First delete all pages including branches
+    return await deleteBook(
+        uid, bookid); // Then delete the book from both collections
   }
 
   // ** Stream Functions
