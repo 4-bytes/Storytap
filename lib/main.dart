@@ -7,20 +7,20 @@ import 'shared/provider.dart';
 import 'package:storytap/shared/loading.dart';
 // Screens
 import 'screens/welcome/welcome.dart';
-import 'screens/home/home.dart';
 import 'screens/authenticate/authenticate.dart';
 import 'package:storytap/screens/navbar.dart';
 
-
+// *** 
+// Root of application that is executed.
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
     return Provider(
-      auth: Auth(),
+      auth: AuthService(),
       child: MaterialApp(
         title: 'Storytap',
         theme: ThemeData(
@@ -51,12 +51,14 @@ class MyApp extends StatelessWidget {
 class HomeController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context).auth;
-    return StreamBuilder(
-      stream: auth.onAuthStateChanged,
+    // Get the current auth status from inherited widget
+    final AuthService auth = Provider.of(context).auth;
+    return StreamBuilder( 
+      stream: auth.onAuthStateChanged, // Check if the auth state has changed
       builder: (context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
-          final bool signedIn = snapshot.hasData;
+          final bool signedIn = snapshot.hasData; 
+          // Displays screen depending on whether snapshot is null or not
           return signedIn ? NavigationBar() : Welcome();
         }
         return Loading();
