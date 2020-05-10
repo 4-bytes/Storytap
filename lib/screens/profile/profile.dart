@@ -29,36 +29,22 @@ class _ProfileState extends State<Profile> {
     final _height = MediaQuery.of(context).size.height;
 
     return SingleChildScrollView(
-      child: Container(
-        height: _height,
-        width: _width,
-        child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Text(
-                  "Profile",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
-                ),
-                FutureBuilder(
-                  // Displays user profile information based on user's authentication status
-                  future: Provider.of(context).auth.getUser(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      // If the connection to snapshot is completed, then display the profile screen
-                      return displayProfileScreen(context, snapshot);
-                    } else {
-                      // Otherwise display a loading indicator
-                      return CircularProgressIndicator();
-                    }
-                  },
-                )
-              ],
-            )),
+      child: Column(
+        children: <Widget>[
+          FutureBuilder(
+            // Displays user profile information based on user's authentication status
+            future: Provider.of(context).auth.getUser(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                // If the connection to snapshot is completed, then display the profile screen
+                return displayProfileScreen(context, snapshot);
+              } else {
+                // Otherwise display a loading indicator
+                return CircularProgressIndicator();
+              }
+            },
+          )
+        ],
       ),
     );
   }
@@ -68,11 +54,37 @@ class _ProfileState extends State<Profile> {
     if (user.isAnonymous == true) {
       return Column(
         children: <Widget>[
-          Image.network("https://firebasestorage.googleapis.com/v0/b/storytap-3c055.appspot.com/o/locked.png?alt=media&token=3a015a79-c9fe-4907-8bf3-72ed4480280a"),
+          Text(""),
+          Image.network(
+              "https://firebasestorage.googleapis.com/v0/b/storytap-3c055.appspot.com/o/locked.png?alt=media&token=3a015a79-c9fe-4907-8bf3-72ed4480280a"),
           Divider(),
           Text("You are currently not signed in."),
           Text("Sign In or Register to view your own profile."),
-          FlatButton(child: Text("Sign In"), onPressed: (){},),
+          Text(""),
+          FlatButton(
+            padding:
+                const EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+            color: primaryThemeColor,
+            textColor: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+            child: Text(
+              "Sign In",
+              style: TextStyle(fontSize: 20),
+            ),
+            onPressed: () async {
+              final auth = Provider.of(context).auth;
+              if (await auth.isAnon()) {
+                // Safety to ensure that prevents signed in from getting deleted
+                print("This is anon");
+                await auth.deleteUser();
+                print("Deleted successfully.");
+              } else {
+                print("Real user");
+                await auth.signOut();
+              }
+            },
+          ),
           Divider(),
         ],
       );
@@ -84,6 +96,7 @@ class _ProfileState extends State<Profile> {
           DateFormat('dd/MM/yyyy').format(user.metadata.lastSignInTime);
       return Column(
         children: <Widget>[
+          Text(""),
           FutureBuilder(
             // Displays user profile image
             future: _getProfileImage(context),
@@ -103,7 +116,7 @@ class _ProfileState extends State<Profile> {
           ),
           Divider(),
           Text(
-            user.displayName,
+            user.displayName.toString(),
             style: TextStyle(fontSize: 32),
           ),
           // DateFormat('dd/MM/yyyy').format(book['bookCreationDate'].toDate()).toString()
@@ -112,7 +125,7 @@ class _ProfileState extends State<Profile> {
             style: TextStyle(fontSize: 20),
           ),
           Text(
-            "Last Seen: " + lastSeen,
+            "Last Online: " + lastSeen,
             style: TextStyle(fontSize: 20),
           ),
           Divider(),
@@ -124,11 +137,10 @@ class _ProfileState extends State<Profile> {
   // Fetches the user's profile image from firebase storage
   Future<Widget> _getProfileImage(BuildContext context) async {
     Image profileImage;
-    final uid = await Provider.of(context).auth.getUID();
+    final id = await Provider.of(context).auth.getUserPhotoURL();
     // StorageService storage = StorageService(id: uid);
     // final pr = await Provider.of(context).auth.getUserPhotoURL();
-    print("Photo above");
-    await StorageService.loadProfileImage(context, uid).then((downloadUrl) {
+    await StorageService.loadProfileImage(context, id).then((downloadUrl) {
       print(downloadUrl.toString());
       profileImage = Image.network(
         downloadUrl.toString(),
