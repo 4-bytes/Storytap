@@ -11,7 +11,7 @@ class StorageService {
 
   // Loads the user's profile image
   static Future<dynamic> loadProfileImage(BuildContext context, String id) async {
-    return await FirebaseStorage.instance.ref().child(id+".png").getDownloadURL();
+    return await FirebaseStorage.instance.ref().child(id).getDownloadURL();
   }
 
   // Loads the book cover image
