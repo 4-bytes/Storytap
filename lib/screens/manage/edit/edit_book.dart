@@ -250,7 +250,7 @@ class _EditBookState extends State<EditBook> {
                               ),
                               FlatButton(
                                 child: Text(
-                                  "Modify",
+                                  "Change",
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 color: primaryThemeColor,

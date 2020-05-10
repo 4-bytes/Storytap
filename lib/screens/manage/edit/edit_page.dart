@@ -21,7 +21,7 @@ class EditPage extends StatefulWidget {
   final Book editedBook;
   final Page editedPage;
   final List<Branch> editedBranch;
-  int branchesLength;
+  final int branchesLength;
 
   EditPage(
       {Key key,
@@ -60,6 +60,7 @@ class _EditPageState extends State<EditPage> {
   String branch2pageID;
   String branch3pageID;
 
+  String _branchErrorMessage = "";
   String _titleErrorMessage;
   String _zefyrErrorMessage;
 
@@ -67,8 +68,7 @@ class _EditPageState extends State<EditPage> {
   void initState() {
     super.initState();
     final document = _loadDocument(); // Load the pageText
-    print(widget.editedBranch[0].text);
-    print(widget.editedBranch[0].pageID);
+    
     setState(() {
       _branchIndex = widget.branchesLength; // Get the number of active branches
     });
@@ -120,10 +120,18 @@ class _EditPageState extends State<EditPage> {
         Flexible(
           child: TextField(
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               labelText: "Branch Text:",
             ),
             controller: _branchTextController[0],
           ),
+        ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
         ),
         pageStream1(context, bookid),
       ],
@@ -136,10 +144,18 @@ class _EditPageState extends State<EditPage> {
         Flexible(
           child: TextField(
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               labelText: "Branch Text:",
             ),
             controller: _branchTextController[1],
           ),
+        ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
         ),
         pageStream2(context, bookid)
       ],
@@ -152,10 +168,18 @@ class _EditPageState extends State<EditPage> {
         Flexible(
           child: TextField(
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               labelText: "Branch Text:",
             ),
             controller: _branchTextController[2],
           ),
+        ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
         ),
         pageStream3(context, bookid),
       ],
@@ -332,6 +356,66 @@ class _EditPageState extends State<EditPage> {
     }
   }
 
+  // Validates first branch
+  bool branchValidator1() {
+    if (branch1PageSelector == null ||
+        branch1pageID == null ||
+        _branchTextController[0].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[0].text.length < 3 ||
+        _branchTextController[0].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Validates second branch
+  bool branchValidator2() {
+    if (branch2PageSelector == null ||
+        branch2PageSelector == null ||
+        _branchTextController[1].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[1].text.length < 3 ||
+        _branchTextController[1].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Validates third branch
+  bool branchValidator3() {
+    if (branch3PageSelector == null ||
+        branch3PageSelector == null ||
+        _branchTextController[2].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[2].text.length < 3 ||
+        _branchTextController[2].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   void dispose() {
     _pageTextController.dispose();
     super.dispose();
@@ -363,6 +447,9 @@ class _EditPageState extends State<EditPage> {
     if (_branchIndex == 1) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
           createBranch1(context, bookid),
           Divider(),
         ],
@@ -370,7 +457,13 @@ class _EditPageState extends State<EditPage> {
     } else if (_branchIndex == 2) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
           createBranch1(context, bookid),
+          SizedBox(
+            height: 10,
+          ),
           createBranch2(context, bookid),
           Divider(),
         ],
@@ -378,8 +471,17 @@ class _EditPageState extends State<EditPage> {
     } else if (_branchIndex == 3) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
           createBranch1(context, bookid),
+          SizedBox(
+            height: 10,
+          ),
           createBranch2(context, bookid),
+          SizedBox(
+            height: 10,
+          ),
           createBranch3(context, bookid),
           Divider(),
         ],
@@ -605,6 +707,7 @@ class _EditPageState extends State<EditPage> {
               children: <Widget>[
                 TextField(
                   decoration: InputDecoration(
+                      errorText: _titleErrorMessage,
                       labelText: "Page Title:",
                       hintText:
                           "This is a page identifier that only you can see."),
@@ -626,6 +729,10 @@ class _EditPageState extends State<EditPage> {
                   style: TextStyle(fontSize: 16),
                 ),
                 createBranch(context, widget.editedBook.id),
+                Text(
+                  _branchErrorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
                 displayBtn(),
                 FlatButton(
                   padding: const EdgeInsets.only(
@@ -634,7 +741,10 @@ class _EditPageState extends State<EditPage> {
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text("Save", style: TextStyle(fontSize: 20),),
+                  child: Text(
+                    "Save",
+                    style: TextStyle(fontSize: 20),
+                  ),
                   onPressed: () async {
                     if (zefyrFieldValidator(_pageTextController) &&
                         pageTitleValidator(_pageTitleController)) {
@@ -651,7 +761,7 @@ class _EditPageState extends State<EditPage> {
                           .document); // Converts values into JSON string
                       widget.editedPage.lastUpdated = DateTime.now();
                       // Creates a subcollection under the "users" and creates a new collection "books" too
-                      print(_branchIndex.toString() + " IS BRANCH");
+                      // print(_branchIndex.toString() + " IS BRANCH");
                       if (_branchIndex == 0) {
                         // Delete all existing branches and don't add any branches
                         database.deleteBranch(
@@ -664,7 +774,7 @@ class _EditPageState extends State<EditPage> {
                             widget.editedPage.id,
                             widget.editedPage);
                         Navigator.pop(context);
-                      } else if (_branchIndex == 1) {
+                      } else if (_branchIndex == 1 && branchValidator1()) {
                         // Delete existing branches
                         database.deleteBranch(
                             uid, widget.editedBook.id, widget.editedPage.id);
@@ -694,7 +804,9 @@ class _EditPageState extends State<EditPage> {
                         print("Updated Firestore with new page + 1 branches");
                         Navigator.pop(context);
                         // Add branch 1 to book
-                      } else if (_branchIndex == 2) {
+                      } else if (_branchIndex == 2 &&
+                          branchValidator1() &&
+                          branchValidator2()) {
                         // Delete existing branches
                         database.deleteBranch(
                             uid, widget.editedBook.id, widget.editedPage.id);
@@ -733,7 +845,10 @@ class _EditPageState extends State<EditPage> {
 
                         Navigator.pop(context);
                         // Add brach 2 to book
-                      } else if (_branchIndex == 3) {
+                      } else if (_branchIndex == 3 &&
+                          branchValidator1() &&
+                          branchValidator2() &&
+                          branchValidator3()) {
                         // Delete existing branches
                         database.deleteBranch(
                             uid, widget.editedBook.id, widget.editedPage.id);

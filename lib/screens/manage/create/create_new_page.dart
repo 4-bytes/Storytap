@@ -54,12 +54,12 @@ class _CreateNewPageState extends State<CreateNewPage> {
 
   // Validates the zefyrField, ensuring that the document limit is not reached
   bool zefyrFieldValidator(ZefyrController controller) {
-    if (controller.document.toPlainText().isEmpty) {
+    if (controller.document.toPlainText().isEmpty || controller.document.length < 5) {
       setState(() {
-        _zefyrErrorMessage = "The page text cannot be left empty.";
+        _zefyrErrorMessage = "The page text cannot be left empty or less than 5 characters in length.";
       });
       return false;
-    } else if (controller.document.length > 400) {
+    } else if (controller.document.length > 600) {
       // Length of the page
       setState(() {
         _zefyrErrorMessage =
@@ -78,7 +78,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
         _titleErrorMessage = "The page identifier cannot be left empty.";
       });
       return false;
-    } else if (controller.text.length < 3 || controller.text.length > 20) {
+    } else if (controller.text.length < 3 || controller.text.length > 15) {
       setState(() {
         _titleErrorMessage =
             "The page identifier must be 3 to 20 characters long";
@@ -126,13 +126,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.restore_page),
-            onPressed: () {
-              _clearTitle(_pageTitleController);
-              _clearDocument(_pageTextController);
-            },
-          )
+          // IconButton(icon: Icon(Icons.restore_page),onPressed: () {_clearTitle(_pageTitleController);_clearDocument(_pageTextController);},)
         ],
         backgroundColor: primaryThemeColor,
         title: Text("Create Starting Page"),
@@ -146,6 +140,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
                 TextField(
                   decoration: InputDecoration(
                       labelText: "Enter Page Title",
+                      errorText: _titleErrorMessage,
                       hintText:
                           "This is a page identifier that only you can see."),
                   maxLength: 15,
@@ -198,6 +193,9 @@ class _CreateNewPageState extends State<CreateNewPage> {
                             .popUntil((route) => route.isFirst);
                       });
                     } else {
+                      if (zefyrFieldValidator(_pageTextController)){
+                        print("Fix");
+                      }
                       print("Max length");
                     }
 

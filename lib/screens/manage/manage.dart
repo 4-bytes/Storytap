@@ -19,33 +19,99 @@ import 'package:storytap/screens/manage/edit/edit_book.dart';
 class Manage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text(""),
-        Text("Books created by you will be displayed here."),
-        Flexible(
-          child: StreamBuilder(
-            stream: getUserBooks(context), // Streams the list of created books
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) { // Checks if the snapshot is not null
-                return const CircularProgressIndicator(); // Display loading indicator until data is retrieved
+    return FutureBuilder(
+      // Checks user's status and then displays their books based on if they are signed in or not
+      future: Provider.of(context).auth.getUser(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If the connection to snapshot is completed, then check user's status
+          return checkIsAnon(context, snapshot);
+        } else {
+          // Otherwise display a loading indicator
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget checkIsAnon(BuildContext context, AsyncSnapshot snapshot) {
+    final user = snapshot.data;
+    if (user.isAnonymous == true) {
+      return Column(
+        children: <Widget>[
+          Text(""),
+          Image.network(
+              "https://firebasestorage.googleapis.com/v0/b/storytap-3c055.appspot.com/o/locked.png?alt=media&token=3a015a79-c9fe-4907-8bf3-72ed4480280a"),
+          Divider(),
+          Text("You are currently not signed in."),
+          Text("Sign In or Register to create your own books."),
+          Text(""),
+          FlatButton(
+            padding:
+                const EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+            color: primaryThemeColor,
+            textColor: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+            child: Text(
+              "Sign In",
+              style: TextStyle(fontSize: 20),
+            ),
+            onPressed: () async {
+              final auth = Provider.of(context).auth;
+              if (await auth.isAnon()) {
+                // Safety to ensure that prevents signed in from getting deleted
+                print("This is anon");
+                await auth.deleteUser();
+                print("Deleted successfully.");
               } else {
-                return new ListView.builder( // Build a book card that displays details of a created book
-                    itemCount: snapshot.data.documents.length, // Length of documents in the snapshot
-                    itemBuilder: (BuildContext context, int index) => // Builds book card based on length
-                        buildBookCard(context, snapshot.data.documents[index]));
+                print("Real user");
+                await auth.signOut();
               }
             },
           ),
-        ),
-      ],
-    );
+          Divider(),
+        ],
+      );
+    } else {
+      return Column(
+        children: <Widget>[
+          Text(""),
+          Text("The books that you create will be displayed below.", style: TextStyle(fontSize: 16), textAlign: TextAlign.center,),
+          Flexible(
+            child: StreamBuilder(
+              stream:
+                  getUserBooks(context), // Streams the list of created books
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  // Checks if the snapshot is not null
+                  return const CircularProgressIndicator(); // Display loading indicator until data is retrieved
+                }          
+                else 
+                {
+                  return new ListView.builder(
+                      // Build a book card that displays details of a created book
+                      itemCount: snapshot.data.documents
+                          .length, // Length of documents in the snapshot
+                      itemBuilder: (BuildContext context,
+                              int index) => // Builds book card based on length
+                          buildBookCard(
+                              context, snapshot.data.documents[index]));
+                }
+              },
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   // Returns a stream of all books for the particular user ordered by last updated date
   Stream<QuerySnapshot> getUserBooks(BuildContext context) async* {
     final uid = await Provider.of(context).auth.getUID();
-    DatabaseService database = DatabaseService(uid: uid); // Init database and retrieve a stream of snapshots from books, oredered by update
+    DatabaseService database = DatabaseService(
+        uid:
+            uid); // Init database and retrieve a stream of snapshots from books, oredered by update
     yield* database.usersCollection
         .document(uid)
         .collection("books")
@@ -69,7 +135,6 @@ class Manage extends StatelessWidget {
     });
     return image;
   }
-
 
   // Displays the icon if the book is completed or not
   Row isCompleteIcon(bool isComplete) {
@@ -159,7 +224,7 @@ class Manage extends StatelessWidget {
     return new Container(
       padding: EdgeInsets.all(16.0),
       child: Card(
-        color: Colors.blueGrey[300],
+        color: Colors.blueGrey[100],
         child: InkWell(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -168,7 +233,11 @@ class Manage extends StatelessWidget {
                 Row(children: <Widget>[
                   Spacer(),
                   IconButton(
-                    icon: Icon(Icons.delete, size: 36,),
+                    icon: Icon(
+                      Icons.delete,
+                      size: 36,
+                      color: Colors.red[600],
+                    ),
                     onPressed: () {
                       deletePrompt(context, createdBook.id);
                     },

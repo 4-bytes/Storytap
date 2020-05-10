@@ -50,7 +50,7 @@ class _AddPageState extends State<AddPage> {
   String _errorMessage = "A branch has not yet been added to this page";
   String _titleErrorMessage; // Displays error text below page title field
   String _zefyrErrorMessage; // Displays error text below page text
-
+  String _branchErrorMessage = "";
   // Each branch with the page title that it is selected with
   String branch1PageSelector;
   String branch2PageSelector;
@@ -107,12 +107,14 @@ class _AddPageState extends State<AddPage> {
 
   // Validates the zefyrField, ensuring that the document limit is not reached
   bool zefyrFieldValidator(ZefyrController controller) {
-    if (controller.document.toPlainText().isEmpty) {
+    if (controller.document.toPlainText().isEmpty ||
+        controller.document.length < 5) {
       setState(() {
-        _zefyrErrorMessage = "The page text cannot be left empty.";
+        _zefyrErrorMessage =
+            "The page text cannot be left empty or less than 5 characters in length.";
       });
       return false;
-    } else if (controller.document.length > 20) {
+    } else if (controller.document.length > 600) {
       // Length of the page
       setState(() {
         _zefyrErrorMessage =
@@ -131,10 +133,10 @@ class _AddPageState extends State<AddPage> {
         _titleErrorMessage = "The page identifier cannot be left empty.";
       });
       return false;
-    } else if (controller.text.length < 3 || controller.text.length > 20) {
+    } else if (controller.text.length < 3 || controller.text.length > 15) {
       setState(() {
         _titleErrorMessage =
-            "The page identifier must be 3 to 20 characters long";
+            "The page identifier must be 3 to 15 characters long.";
       });
       return false;
     } else {
@@ -142,6 +144,62 @@ class _AddPageState extends State<AddPage> {
     }
   }
 
+  // Validates first branch
+  bool branchValidator1() {
+    if (branch1PageSelector == null ||
+        branch1pageID == null ||
+        _branchTextController[0].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[0].text.length < 3 || _branchTextController[0].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Validates second branch
+  bool branchValidator2() {
+    if (branch2PageSelector == null ||
+        branch2PageSelector == null ||
+        _branchTextController[1].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[1].text.length < 3 || _branchTextController[1].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Validates third branch
+  bool branchValidator3() {
+    if (branch3PageSelector == null ||
+        branch3PageSelector == null ||
+        _branchTextController[2].text == "") {
+      setState(() {
+        _branchErrorMessage = "Branches cannot be left empty.";
+      });
+      return false;
+    } else if (_branchTextController[2].text.length < 3 || _branchTextController[2].text.length > 15) {
+      setState(() {
+        _branchErrorMessage = "Branch Text must be 3 to 10 characters long.";
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
   // Create a branch based on the current branchIndex
   Widget createBranch1(BuildContext context, String bookid) {
     return Row(
@@ -149,10 +207,18 @@ class _AddPageState extends State<AddPage> {
         Flexible(
           child: TextField(
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               labelText: "Branch Text:",
             ),
             controller: _branchTextController[0],
           ),
+        ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
         ),
         pageStream1(context, bookid),
       ],
@@ -165,12 +231,44 @@ class _AddPageState extends State<AddPage> {
         Flexible(
           child: TextField(
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               labelText: "Branch Text:",
             ),
             controller: _branchTextController[1],
           ),
         ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
+        ),
         pageStream2(context, bookid)
+      ],
+    );
+  }
+
+  Widget createBranch3(BuildContext context, String bookid) {
+    return Row(
+      children: <Widget>[
+        Flexible(
+          child: TextField(
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              labelText: "Branch Text:",
+            ),
+            controller: _branchTextController[2],
+          ),
+        ),
+        Text(
+          "AA",
+          style: TextStyle(color: Colors.white),
+        ),
+        pageStream3(context, bookid),
       ],
     );
   }
@@ -301,48 +399,43 @@ class _AddPageState extends State<AddPage> {
         });
   }
 
-  Widget createBranch3(BuildContext context, String bookid) {
-    return Row(
-      children: <Widget>[
-        Flexible(
-          child: TextField(
-            decoration: InputDecoration(
-              labelText: "Branch Text:",
-            ),
-            controller: _branchTextController[2],
-          ),
-        ),
-        pageStream3(context, bookid),
-      ],
-    );
-  }
-
+  // A widget that creates branches based on the current index
   Widget createBranch(BuildContext context, String bookid) {
     if (_branchIndex == 1) {
       return Column(
+        // Displays a column with 1 branch
         children: <Widget>[
+          SizedBox(height: 10,),
           createBranch1(context, bookid),
           Divider(),
         ],
       );
     } else if (_branchIndex == 2) {
       return Column(
+        // Displays a column with 2 branches
         children: <Widget>[
+          SizedBox(height: 10,),
           createBranch1(context, bookid),
+          SizedBox(height: 10,),
           createBranch2(context, bookid),
           Divider(),
         ],
       );
     } else if (_branchIndex == 3) {
       return Column(
+        // Displays a column with 3 branches
         children: <Widget>[
+          SizedBox(height: 10,),
           createBranch1(context, bookid),
+          SizedBox(height: 10,),
           createBranch2(context, bookid),
+          SizedBox(height: 10,),
           createBranch3(context, bookid),
           Divider(),
         ],
       );
     } else
+      // If no branches then display an empty widget
       return SizedBox.shrink();
   }
 
@@ -383,6 +476,7 @@ class _AddPageState extends State<AddPage> {
                       setState(() {
                         _errorMessage = "";
                         _branchIndex = _branchIndex + 1;
+                        _branchErrorMessage = "";
                       });
                     else if (_branchIndex == 3) {
                       setState(() {
@@ -419,6 +513,7 @@ class _AddPageState extends State<AddPage> {
                       setState(() {
                         _errorMessage = "";
                         _branchIndex = _branchIndex - 1;
+                        _branchErrorMessage = "";
                       });
                     }
                     if (_branchIndex == 0) {
@@ -465,6 +560,7 @@ class _AddPageState extends State<AddPage> {
               children: <Widget>[
                 TextField(
                   decoration: InputDecoration(
+                      errorText: _titleErrorMessage,
                       labelText: "Page Title:",
                       hintText:
                           "This is a page identifier that only you can see."),
@@ -473,6 +569,7 @@ class _AddPageState extends State<AddPage> {
                   autofocus: true,
                 ),
                 ZefyrField(
+                  decoration: InputDecoration(errorText: _zefyrErrorMessage),
                   autofocus: false,
                   height: _editorHeight * 0.75,
                   physics: ClampingScrollPhysics(),
@@ -485,6 +582,10 @@ class _AddPageState extends State<AddPage> {
                   style: TextStyle(fontSize: 16),
                 ),
                 createBranch(context, widget.createdBook.id),
+                Text(
+                  _branchErrorMessage,
+                  style: TextStyle(color: Colors.red,),
+                ),
                 displayBtn(),
                 FlatButton(
                   padding: const EdgeInsets.only(
@@ -493,57 +594,64 @@ class _AddPageState extends State<AddPage> {
                   textColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40)),
-                  child: Text("Add Page", style: TextStyle(fontSize: 20),),
+                  child: Text(
+                    "Add Page",
+                    style: TextStyle(fontSize: 20),
+                  ),
                   onPressed: () async {
-                    print("Created a new page");
-                    final uid = await Provider.of(context).auth.getUID();
-                    final username =
-                        await Provider.of(context).auth.getUsername();
-                    final database = DatabaseService(uid: uid);
-                    // Updating createdBook properties
-                    widget.createdBook.lastUpdated = DateTime.now();
-                    // Updating createdPage properties
-                    widget.createdPage.title = _pageTitleController.text;
-                    widget.createdPage.text = jsonEncode(_pageTextController
-                        .document); // Converts values into JSON string
-                    widget.createdPage.lastUpdated = DateTime.now();
-                    widget.createdPage.initial = false;
-                    // Setting up branches to the newly created page if it contains any and updating firestore database
-                    if (_branchIndex == 0) {
-                      // Create a new page without any branching
-                      await database
-                          .createPageDocument(widget.createdBook.id,
-                              widget.createdBook, widget.createdPage)
-                          .then((_) {
-                        print("Updated Firestore with new page + no branches");
-                        Navigator.pop(context);
-                      });
-                    } else if (_branchIndex == 1) {
-                      // Create a new page with 1 branch
-                      widget.createdBranch[0].text =
-                          _branchTextController[0].text;
-                      widget.createdBranch[0].number = 1;
-                      widget.createdBranch[0].pageID = branch1pageID;
-                      widget.createdBranch[0].pageTitle = branch1PageSelector;
-                      // Create a new page and use the reference to create a new branch for that newly created page
-                      DocumentReference createdPage =
-                          await database.createPageDocument(
+                    if (zefyrFieldValidator(_pageTextController) &&
+                        pageTitleValidator(_pageTitleController)) {
+                      print("Passed validation 1");
+                      final uid = await Provider.of(context).auth.getUID();
+                      final username =
+                          await Provider.of(context).auth.getUsername();
+                      final database = DatabaseService(uid: uid);
+                      // Updating createdBook properties
+                      widget.createdBook.lastUpdated = DateTime.now();
+                      // Updating createdPage properties
+                      widget.createdPage.title = _pageTitleController.text;
+                      widget.createdPage.text = jsonEncode(_pageTextController
+                          .document); // Converts values into JSON string
+                      widget.createdPage.lastUpdated = DateTime.now();
+                      widget.createdPage.initial = false;
+                      // Setting up branches to the newly created page if it contains any and updating firestore database
+                      if (_branchIndex == 0) {
+                        // Create a new page without any branching
+                        await database
+                            .createPageDocument(widget.createdBook.id,
+                                widget.createdBook, widget.createdPage)
+                            .then((_) {
+                          print(
+                              "Updated Firestore with new page + no branches");
+                          Navigator.pop(context);
+                        });
+                      } else if (_branchIndex == 1 && branchValidator1()) {
+                        print("Passed validation 2");
+                        // Create a new page with 1 branch
+                        widget.createdBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.createdBranch[0].number = 1;
+                        widget.createdBranch[0].pageID = branch1pageID;
+                        widget.createdBranch[0].pageTitle = branch1PageSelector;
+                        // Create a new page and use the reference to create a new branch for that newly created page
+                        DocumentReference createdPage =
+                            await database.createPageDocument(
+                                widget.createdBook.id,
+                                widget.createdBook,
+                                widget.createdPage);
+                        widget.createdPage.id = createdPage
+                            .documentID; // Assign documentID to the createdPage
+                        // Create branches for the newly created page
+                        for (int i = 0; i < _branchIndex; i++) {
+                          // Loop through each branch and update Firestore
+                          await database.createBranchDocument(
                               widget.createdBook.id,
-                              widget.createdBook,
-                              widget.createdPage);
-                      widget.createdPage.id = createdPage
-                          .documentID; // Assign documentID to the createdPage
-                      // Create branches for the newly created page
-                      for (int i = 0; i < _branchIndex; i++) {
-                        // Loop through each branch and update Firestore
-                        await database.createBranchDocument(
-                            widget.createdBook.id,
-                            widget.createdPage.id,
-                            widget.createdBranch[i]);
-                      }
-                      print("Updated Firestore with new page + 1 branches");
-                      Navigator.pop(context);
-                      /*await database
+                              widget.createdPage.id,
+                              widget.createdBranch[i]);
+                        }
+                        print("Updated Firestore with new page + 1 branches");
+                        Navigator.pop(context);
+                        /*await database
                           .createBranchDocument(
                               widget.createdBook.id,
                               widget.createdPage.id,
@@ -555,101 +663,77 @@ class _AddPageState extends State<AddPage> {
                         Navigator.of(context)
                             .popUntil((route) => route.isFirst);
                       }); */
-                    } else if (_branchIndex == 2) {
-                      // Create a new page with 2 branches
-                      widget.createdBranch[0].text =
-                          _branchTextController[0].text;
-                      widget.createdBranch[0].number = 1;
-                      widget.createdBranch[0].pageID = branch1pageID;
-                      widget.createdBranch[0].pageTitle = branch1PageSelector;
-                      widget.createdBranch[1].text =
-                          _branchTextController[1].text;
-                      widget.createdBranch[1].number = 2;
-                      widget.createdBranch[1].pageID = branch2pageID;
-                      widget.createdBranch[1].pageTitle = branch2PageSelector;
-                      // Create a new page and use the reference to create a new branch for that newly created page
-                      DocumentReference createdPage =
-                          await database.createPageDocument(
-                              widget.createdBook.id,
-                              widget.createdBook,
-                              widget.createdPage);
-                      widget.createdPage.id = createdPage
-                          .documentID; // Assign documentID to the createdPage
-                      for (int i = 0; i < _branchIndex; i++) {
-                        // Loop through each branch and update Firestore
-                        await database.createBranchDocument(
-                            widget.createdBook.id,
-                            widget.createdPage.id,
-                            widget.createdBranch[i]);
-                      }
-                      print("Updated Firestore with new page + 2 branches");
-                      Navigator.pop(context);
-                    } else if (_branchIndex == 3) {
-                      // Create a new page with 3 branches
-                      widget.createdBranch[0].text =
-                          _branchTextController[0].text;
-                      widget.createdBranch[0].number = 1;
-                      widget.createdBranch[0].pageID = branch1pageID;
-                      widget.createdBranch[0].pageTitle = branch1PageSelector;
-                      widget.createdBranch[1].text =
-                          _branchTextController[1].text;
-                      widget.createdBranch[1].number = 2;
-                      widget.createdBranch[1].pageID = branch2pageID;
-                      widget.createdBranch[1].pageTitle = branch2PageSelector;
-                      widget.createdBranch[2].text =
-                          _branchTextController[2].text;
-                      widget.createdBranch[2].number = 3;
-                      widget.createdBranch[2].pageID = branch3pageID;
-                      widget.createdBranch[2].pageTitle = branch3PageSelector;
-                      // Create a new page and use the reference to create a new branch for that newly created page
-                      DocumentReference createdPage =
-                          await database.createPageDocument(
-                              widget.createdBook.id,
-                              widget.createdBook,
-                              widget.createdPage);
-                      widget.createdPage.id = createdPage
-                          .documentID; // Assign documentID to the createdPage
-
-                      for (int i = 0; i < _branchIndex; i++) {
-                        // Loop through each branch and update Firestore
-                        await database.createBranchDocument(
-                            widget.createdBook.id,
-                            widget.createdPage.id,
-                            widget.createdBranch[i]);
-                      }
-                      print("Updated Firestore with new page + 3 branches");
-                      Navigator.pop(context);
-                      // Create branches for the newly created page
-                      /* await database
-                          .createBranchDocument(
+                      } else if (_branchIndex == 2 &&
+                          branchValidator1() &&
+                          branchValidator2()) {
+                        // Create a new page with 2 branches
+                        widget.createdBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.createdBranch[0].number = 1;
+                        widget.createdBranch[0].pageID = branch1pageID;
+                        widget.createdBranch[0].pageTitle = branch1PageSelector;
+                        widget.createdBranch[1].text =
+                            _branchTextController[1].text;
+                        widget.createdBranch[1].number = 2;
+                        widget.createdBranch[1].pageID = branch2pageID;
+                        widget.createdBranch[1].pageTitle = branch2PageSelector;
+                        // Create a new page and use the reference to create a new branch for that newly created page
+                        DocumentReference createdPage =
+                            await database.createPageDocument(
+                                widget.createdBook.id,
+                                widget.createdBook,
+                                widget.createdPage);
+                        widget.createdPage.id = createdPage
+                            .documentID; // Assign documentID to the createdPage
+                        for (int i = 0; i < _branchIndex; i++) {
+                          // Loop through each branch and update Firestore
+                          await database.createBranchDocument(
                               widget.createdBook.id,
                               widget.createdPage.id,
-                              widget.createdBook,
-                              widget.createdPage,
-                              widget.createdBranch)
-                          .then((_) {
+                              widget.createdBranch[i]);
+                        }
+                        print("Updated Firestore with new page + 2 branches");
+                        Navigator.pop(context);
+                      } else if (_branchIndex == 3 &&
+                          branchValidator1() &&
+                          branchValidator2() &&
+                          branchValidator3()) {
+                        // Create a new page with 3 branches
+                        widget.createdBranch[0].text =
+                            _branchTextController[0].text;
+                        widget.createdBranch[0].number = 1;
+                        widget.createdBranch[0].pageID = branch1pageID;
+                        widget.createdBranch[0].pageTitle = branch1PageSelector;
+                        widget.createdBranch[1].text =
+                            _branchTextController[1].text;
+                        widget.createdBranch[1].number = 2;
+                        widget.createdBranch[1].pageID = branch2pageID;
+                        widget.createdBranch[1].pageTitle = branch2PageSelector;
+                        widget.createdBranch[2].text =
+                            _branchTextController[2].text;
+                        widget.createdBranch[2].number = 3;
+                        widget.createdBranch[2].pageID = branch3pageID;
+                        widget.createdBranch[2].pageTitle = branch3PageSelector;
+                        // Create a new page and use the reference to create a new branch for that newly created page
+                        DocumentReference createdPage =
+                            await database.createPageDocument(
+                                widget.createdBook.id,
+                                widget.createdBook,
+                                widget.createdPage);
+                        widget.createdPage.id = createdPage
+                            .documentID; // Assign documentID to the createdPage
+
+                        for (int i = 0; i < _branchIndex; i++) {
+                          // Loop through each branch and update Firestore
+                          await database.createBranchDocument(
+                              widget.createdBook.id,
+                              widget.createdPage.id,
+                              widget.createdBranch[i]);
+                        }
                         print("Updated Firestore with new page + 3 branches");
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                      }); */
-                    }
-
-                    //database.createBookDocument(
-                    //    widget.createdBook.title,
-                    //    widget.createdBook.description,
-                    //    widget.createdBook.genre,
-                    //    widget.createdBook.cover,
-                    //    widget.createdBook.isComplete,
-                    //    widget.createdBook.creationDate,
-                    //    widget.createdBook.lastUpdated);
-
-                    // await Firestore.instance.collection("test").add({
-                    //  'pageText': widget.createdPage.text,
-                    //  'pageUpdated': widget.createdPage.lastUpdated,
-                    //}).then((_) {
-
-                    // print("JSON: ");
-                    // print(_pageTextController.document.toJson());
+                        Navigator.pop(context);
+                      }
+                    } else {}
                   },
                 ),
               ],
