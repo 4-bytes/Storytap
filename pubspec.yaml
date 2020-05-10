@@ -35,6 +35,7 @@ dependencies:
   intl: ^0.16.1
   zefyr: ^0.10.0
   quill_delta: ^1.0.1
+  image_picker: ^0.6.6+1
   
 dev_dependencies:
   flutter_test:
