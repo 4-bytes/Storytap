@@ -53,6 +53,7 @@ class AuthService {
   Future updateUserInfo(String username, FirebaseUser currentUser) async {
     var updateUserDetails = UserUpdateInfo();
     updateUserDetails.displayName = username;
+    updateUserDetails.photoUrl = "default.png";
     await currentUser.updateProfile(updateUserDetails);
     await currentUser.reload();
   }
