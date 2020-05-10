@@ -71,10 +71,6 @@ class _NavigationBar extends State<NavigationBar> {
       // Browse
       setState(() {
         _appBarWidgets = <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          )
         ];
       });
       return _appBarWidgets;
@@ -105,10 +101,7 @@ class _NavigationBar extends State<NavigationBar> {
           _appBarWidgets = <Widget>[];
         } else {
           _appBarWidgets = <Widget>[
-            IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {},
-            )
+           
           ];
         }
       });
