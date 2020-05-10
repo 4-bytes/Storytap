@@ -60,27 +60,27 @@ class _ReaderState extends State<Reader> {
     final page = await pageSnapshot.get(); // This is the document
 
     // Assign the new page's data into the currentPage's values
+    widget.currentPage.text = ""; // Reset the value as safety
     widget.currentPage.text = page.data['pageText'];
     widget.currentPage.id = page.documentID;
     widget.currentPage.lastUpdated = page.data['pageLastUpdated'].toDate();
-
     // Next retrieve all the branches from that page
     final branches = await pageSnapshot.collection("branches").getDocuments();
     int newBranchLength = 0; // Set the newBranch length as 0
-    
-
 
     for (int i = 0; i < branches.documents.length; i++) {
-      print("CHANGED VALUES");
-      newBranchLength = newBranchLength + 1; // Add branch details and increment each time
+      // print("CHANGED VALUES");
+      newBranchLength =
+          newBranchLength + 1; // Add branch details and increment each time
       widget.currentBranch[i].text = branches.documents[i]['branchText'];
-      widget.currentBranch[i].pageID = branches.documents[i]['branchPageReference'];
+      widget.currentBranch[i].pageID =
+          branches.documents[i]['branchPageReference'];
       print(widget.currentBranch[i].text);
       print(widget.currentBranch[i].pageID);
     }
 
-    
-    Navigator.pushReplacement( // Replace the current screen with a new one passing all new values to it
+    Navigator.pushReplacement(
+        // Replace the current screen with a new one passing all new values to it
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => Reader(
@@ -97,7 +97,10 @@ class _ReaderState extends State<Reader> {
       color: secondaryThemeColor,
       textColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      child: Text(widget.currentBranch[0].text),
+      child: Text(
+        widget.currentBranch[0].text,
+        style: TextStyle(fontSize: 20),
+      ),
       onPressed: () async {
         loadPage(0);
       },
@@ -109,7 +112,10 @@ class _ReaderState extends State<Reader> {
       color: secondaryThemeColor,
       textColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      child: Text(widget.currentBranch[1].text),
+      child: Text(
+        widget.currentBranch[1].text,
+        style: TextStyle(fontSize: 20),
+      ),
       onPressed: () async {
         loadPage(1);
       },
@@ -121,7 +127,10 @@ class _ReaderState extends State<Reader> {
       color: secondaryThemeColor,
       textColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      child: Text(widget.currentBranch[2].text),
+      child: Text(
+        widget.currentBranch[2].text,
+        style: TextStyle(fontSize: 20),
+      ),
       onPressed: () async {
         loadPage(2);
       },
@@ -132,6 +141,23 @@ class _ReaderState extends State<Reader> {
     if (widget.branchesLength == 1) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
+          Divider(),
+                              SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Pick an option: ",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SizedBox(
+            height: 10,
+          ),
           branchButton1(),
         ],
       );
@@ -139,7 +165,27 @@ class _ReaderState extends State<Reader> {
     } else if (widget.branchesLength == 2) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
+          Divider(),
+                              SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Pick an option: ",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SizedBox(
+            height: 10,
+          ),
           branchButton1(),
+          SizedBox(
+            height: 10,
+          ),
           branchButton2(),
         ],
       );
@@ -147,8 +193,31 @@ class _ReaderState extends State<Reader> {
     } else if (widget.branchesLength == 3) {
       return Column(
         children: <Widget>[
+          SizedBox(
+            height: 10,
+          ),
+          Divider(),
+                    SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Pick an option: ",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SizedBox(
+            height: 10,
+          ),
           branchButton1(),
+          SizedBox(
+            height: 10,
+          ),
           branchButton2(),
+          SizedBox(
+            height: 10,
+          ),
           branchButton3(),
         ],
       ); // Display all 3
@@ -161,13 +230,26 @@ class _ReaderState extends State<Reader> {
   Widget completedBook() {
     return Column(
       children: <Widget>[
-        Text("You have reached the end of this book."),
+        SizedBox(
+          height: 10,
+        ),
+        Divider(),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          "You have reached the end of this book.",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 10,
+        ),
         FlatButton(
           color: secondaryThemeColor,
           textColor: Colors.white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-          child: Text("Close Book"),
+          child: Text("Close Book", style: TextStyle(fontSize: 20)),
           onPressed: () {
             Navigator.pop(context);
           },
