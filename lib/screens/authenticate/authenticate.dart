@@ -100,6 +100,7 @@ class _AuthenticateState extends State<Authenticate> {
             Navigator.pushNamedAndRemoveUntil(context, "/home", (r) => false);
             break;
           case AuthFormType.register:
+
             break;
           case AuthFormType.resetPassword:
             // Reset password form
@@ -323,10 +324,10 @@ class _AuthenticateState extends State<Authenticate> {
       ));
       return textFields;
     }
-
-    // If in register state then add username, email and password fields
-    if ([AuthFormType.register, AuthFormType.convertAnon]
-        .contains(AuthFormType)) {
+    // print(authFormType.index);
+    // If in register state then add username, email and password fields, [AuthFormType.register, AuthFormType.convertAnon].contains(AuthFormType) was removed so this will need to be changed
+    if (authFormType.index == 1) {
+      
       textFields.add(
         TextFormField(
           style: TextStyle(
@@ -513,9 +514,6 @@ class _AuthenticateState extends State<Authenticate> {
                 _infoMessage = error;
               }
             },
-          ),
-          FacebookSignInButton(
-            onPressed: () {},
           ),
         ],
       ),
