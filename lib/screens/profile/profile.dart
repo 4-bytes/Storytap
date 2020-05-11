@@ -1,11 +1,7 @@
 // Packages
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 // Services
-import 'package:storytap/services/auth.dart';
 import 'package:storytap/services/storage.dart';
 // Shared
 import 'package:storytap/shared/provider.dart';
@@ -16,7 +12,7 @@ import 'package:storytap/screens/authenticate/authenticate.dart';
 // Profile page for registered users. It displays the user's information such as registered date, last online, and profile image.
 
 class Profile extends StatefulWidget {
-  String profileImageID = "";
+  final String profileImageID = "";
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -25,9 +21,6 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    final _width = MediaQuery.of(context).size.width;
-    final _height = MediaQuery.of(context).size.height;
-
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[

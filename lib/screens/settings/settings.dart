@@ -1,7 +1,6 @@
 // Dependencies
 import 'package:flutter/material.dart';
 // Services
-import 'package:storytap/services/auth.dart';
 // Shared
 import 'package:storytap/shared/provider.dart';
 // Screens

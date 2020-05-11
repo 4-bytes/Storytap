@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:storytap/models/book.dart';
 // Services
-import 'package:storytap/services/auth.dart';
 import 'package:storytap/services/database.dart';
 import 'package:storytap/services/storage.dart';
 // Shared
