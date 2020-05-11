@@ -541,13 +541,7 @@ class _AddPageState extends State<AddPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.restore_page),
-            onPressed: () {
-              _clearTitle(_pageTitleController);
-              _clearDocument(_pageTextController);
-            },
-          )
+          // IconButton(icon: Icon(Icons.restore_page),onPressed: () {_clearTitle(_pageTitleController);_clearDocument(_pageTextController);},)
         ],
         backgroundColor: primaryThemeColor,
         title: Text("Create Page"),

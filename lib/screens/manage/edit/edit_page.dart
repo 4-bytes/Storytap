@@ -637,7 +637,8 @@ class _EditPageState extends State<EditPage> {
                 ),
               ],
             );
-          } else {
+          } 
+          else {
             return AlertDialog(
               title: Text("Delete this page?"),
               content: Text(
@@ -684,6 +685,8 @@ class _EditPageState extends State<EditPage> {
           }
         });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -773,6 +776,7 @@ class _EditPageState extends State<EditPage> {
                             widget.editedBook.id,
                             widget.editedPage.id,
                             widget.editedPage);
+                        
                         Navigator.pop(context);
                       } else if (_branchIndex == 1 && branchValidator1()) {
                         // Delete existing branches
