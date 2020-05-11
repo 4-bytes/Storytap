@@ -1,12 +1,10 @@
 // Packages
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:storytap/services/storage.dart';
 import 'package:storytap/shared/provider.dart';
 import 'package:zefyr/zefyr.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 // Models
@@ -14,9 +12,6 @@ import 'package:storytap/models/book.dart';
 import 'package:storytap/models/page.dart';
 // Services
 import 'package:storytap/services/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-// Shared
-import 'package:storytap/shared/validator.dart';
 // ***
 // Creates an initial page along with the created book and writes this newly added data to cloud firestore.
 
@@ -102,6 +97,7 @@ class _CreateNewPageState extends State<CreateNewPage> {
     return NotusDocument.fromDelta(delta);
   }
 
+/*
   // Clears the page text
   void _clearDocument(ZefyrController controller) {
     try {
@@ -110,13 +106,13 @@ class _CreateNewPageState extends State<CreateNewPage> {
     } catch (error) {
       print(error);
     }
-  }
-
+  } */
+/*
   // Clears the page title
   void _clearTitle(TextEditingController pageTitle) {
     pageTitle.text = "";
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     _pageTitleController.text = widget.createdPage.title;

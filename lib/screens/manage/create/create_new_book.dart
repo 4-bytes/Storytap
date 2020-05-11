@@ -1,8 +1,5 @@
 // Packages
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:path/path.dart' as path;
 // Screens
 import 'package:storytap/screens/authenticate/authenticate.dart';
 import 'package:storytap/screens/manage/create/create_new_page.dart';
@@ -10,7 +7,7 @@ import 'package:storytap/screens/manage/create/create_new_page.dart';
 import 'package:storytap/models/book.dart';
 import 'package:storytap/models/page.dart';
 // Services
-import 'package:storytap/services/storage.dart';
+
 
 // ***
 // A form that creates a new book and navigates to create_new_page screen where additional page details are entered.

@@ -1,7 +1,6 @@
 // Packages
 import 'package:flutter/material.dart';
 // Services
-import 'package:storytap/services/auth.dart';
 // Screens
 import 'package:storytap/screens/home/home.dart';
 import 'package:storytap/screens/browse/browse.dart';

@@ -80,6 +80,7 @@ class _AddPageState extends State<AddPage> {
     return NotusDocument.fromDelta(delta);
   }
 
+/*
   void _clearDocument(ZefyrController controller) {
     try {
       controller.replaceText(
@@ -87,12 +88,13 @@ class _AddPageState extends State<AddPage> {
     } catch (error) {
       print(error);
     }
-  }
+  } */
 
+/*
   void _clearTitle(TextEditingController pageTitle) {
     pageTitle.text = "";
   }
-
+*/
   // A stream of all pages snapshot
   Stream<QuerySnapshot> getPages(BuildContext context, String bookid) async* {
     final uid = await Provider.of(context).auth.getUID();
@@ -281,7 +283,7 @@ class _AddPageState extends State<AddPage> {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
           } else {
-            Page page = new Page(book: widget.createdBook, text: "", id: "");
+            // Page page = new Page(book: widget.createdBook, text: "", id: "");
             List<String> pageID = [];
             List<String> pageTitle = [];
             List<DropdownMenuItem> pageList = [];
@@ -322,7 +324,7 @@ class _AddPageState extends State<AddPage> {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
           } else {
-            Page page = new Page(book: widget.createdBook, text: "", id: "");
+            // Page page = new Page(book: widget.createdBook, text: "", id: "");
             List<String> pageID = [];
             List<String> pageTitle = [];
             List<DropdownMenuItem> pageList = [];
@@ -363,7 +365,7 @@ class _AddPageState extends State<AddPage> {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
           } else {
-            Page page = new Page(book: widget.createdBook, text: "", id: "");
+            // Page page = new Page(book: widget.createdBook, text: "", id: "");
             List<String> pageID =
                 []; // Keeps track of the pageID assigned to each page
             List<String> pageTitle = [];
@@ -597,8 +599,7 @@ class _AddPageState extends State<AddPage> {
                         pageTitleValidator(_pageTitleController)) {
                       print("Passed validation 1");
                       final uid = await Provider.of(context).auth.getUID();
-                      final username =
-                          await Provider.of(context).auth.getUsername();
+                      
                       final database = DatabaseService(uid: uid);
                       // Updating createdBook properties
                       widget.createdBook.lastUpdated = DateTime.now();
